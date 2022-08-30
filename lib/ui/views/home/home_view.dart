@@ -17,7 +17,6 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ViewModelBuilder<HomeViewModel>.reactive(
       disposeViewModel: false,
-      fireOnModelReadyOnce: true,
       onModelReady: (model) => model.initialize(),
       viewModelBuilder: () => locator<HomeViewModel>(),
       builder: (context, model, child) => Scaffold(
@@ -112,7 +111,7 @@ class HomeView extends StatelessWidget {
                     const SizedBox(height: 14),
                     model.showUpdatableApps
                         ? AvailableUpdatesCard()
-                        : InstalledAppsCard()
+                        : InstalledAppsCard(),
                   ],
                 ),
               ),
