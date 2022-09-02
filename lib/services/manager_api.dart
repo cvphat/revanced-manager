@@ -68,6 +68,13 @@ class ManagerAPI {
   Future<void> savePatchedApp(PatchedApplication app) async {
     List<PatchedApplication> patchedApps = getPatchedApps();
     patchedApps.removeWhere((a) => a.packageName == app.packageName);
+    ApplicationWithIcon? installed =
+        await DeviceApps.getApp(app.packageName, true) as ApplicationWithIcon?;
+    if (installed != null) {
+      app.name = installed.appName;
+      app.version = installed.versionName!;
+      app.icon = installed.icon;
+    }
     patchedApps.add(app);
     await setPatchedApps(patchedApps);
   }
@@ -83,6 +90,20 @@ class ManagerAPI {
       } else {
         app.hasUpdates = await hasAppUpdates(app.packageName, app.patchDate);
         app.changelog = await getAppChangelog(app.packageName, app.patchDate);
+        if (!app.hasUpdates) {
+          String? currentInstalledVersion =
+              (await DeviceApps.getApp(app.packageName))?.versionName;
+          if (currentInstalledVersion != null) {
+            String currentSavedVersion = app.version;
+            int currentInstalledVersionInt = int.parse(
+                currentInstalledVersion.replaceAll(RegExp('[^0-9]'), ''));
+            int currentSavedVersionInt =
+                int.parse(currentSavedVersion.replaceAll(RegExp('[^0-9]'), ''));
+            if (currentInstalledVersionInt > currentSavedVersionInt) {
+              app.hasUpdates = true;
+            }
+          }
+        }
       }
     }
     patchedApps.removeWhere((a) => toRemove.contains(a));
