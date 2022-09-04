@@ -13,11 +13,11 @@ class ContributorsViewModel extends BaseViewModel {
 
   Future<void> getContributors() async {
     patchesContributors = await _githubAPI.getContributors(
-      ghOrg,
+      ghPathcesOrg,
       patchesRepo,
     );
     integrationsContributors = await _githubAPI.getContributors(
-      ghOrg,
+      ghIntegrationsOrg,
       integrationsRepo,
     );
     patcherContributors = await _githubAPI.getContributors(
@@ -29,7 +29,7 @@ class ContributorsViewModel extends BaseViewModel {
       cliRepo,
     );
     managerContributors = await _githubAPI.getContributors(
-      ghOrg,
+      ghManagerOrg,
       managerRepo,
     );
     notifyListeners();

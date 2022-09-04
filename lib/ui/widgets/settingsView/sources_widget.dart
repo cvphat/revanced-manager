@@ -53,23 +53,47 @@ class SourcesWidget extends StatelessWidget {
             : Theme.of(context).navigationBarTheme.backgroundColor!,
         child: Column(
           children: <Widget>[
-            CustomTextField(
-              inputController: organizationController,
-              label: I18nText('sourcesCard.organizationLabel'),
-              hint: ghOrg,
-              onChanged: (value) => ghOrg = value,
+            Row(
+              children: [
+                Expanded(
+                  child: CustomTextField(
+                    inputController: organizationController,
+                    label: I18nText('sourcesCard.organizationLabel'),
+                    hint: ghPathcesOrg,
+                    onChanged: (value) => ghPathcesOrg = value,
+                  ),
+                ),
+                const Text('/'),
+                Expanded(
+                  child: CustomTextField(
+                    inputController: patchesSourceController,
+                    label: I18nText('sourcesCard.patchesSourceLabel'),
+                    hint: patchesRepo,
+                    onChanged: (value) => patchesRepo = value,
+                  ),
+                ),
+              ],
             ),
-            CustomTextField(
-              inputController: patchesSourceController,
-              label: I18nText('sourcesCard.patchesSourceLabel'),
-              hint: patchesRepo,
-              onChanged: (value) => patchesRepo = value,
-            ),
-            CustomTextField(
-              inputController: integrationsSourceController,
-              label: I18nText('sourcesCard.integrationsSourceLabel'),
-              hint: integrationsRepo,
-              onChanged: (value) => integrationsRepo = value,
+            Row(
+              children: [
+                Expanded(
+                  child: CustomTextField(
+                    inputController: organizationController,
+                    label: I18nText('sourcesCard.organizationLabel'),
+                    hint: ghIntegrationsOrg,
+                    onChanged: (value) => ghIntegrationsOrg = value,
+                  ),
+                ),
+                const Text('/'),
+                Expanded(
+                  child: CustomTextField(
+                    inputController: integrationsSourceController,
+                    label: I18nText('sourcesCard.integrationsSourceLabel'),
+                    hint: integrationsRepo,
+                    onChanged: (value) => integrationsRepo = value,
+                  ),
+                ),
+              ],
             ),
           ],
         ),

@@ -21,27 +21,29 @@ class ManagerAPI {
   }
 
   Future<File?> downloadPatches(String extension) async {
-    return await _githubAPI.latestReleaseFile(extension, ghOrg, patchesRepo);
+    return await _githubAPI.latestReleaseFile(
+        extension, ghPathcesOrg, patchesRepo);
   }
 
   Future<File?> downloadIntegrations(String extension) async {
     return await _githubAPI.latestReleaseFile(
       extension,
-      ghOrg,
+      ghIntegrationsOrg,
       integrationsRepo,
     );
   }
 
   Future<File?> downloadManager(String extension) async {
-    return await _githubAPI.latestReleaseFile(extension, ghOrg, managerRepo);
+    return await _githubAPI.latestReleaseFile(
+        extension, ghManagerOrg, managerRepo);
   }
 
   Future<String?> getLatestPatchesVersion() async {
-    return await _githubAPI.latestReleaseVersion(ghOrg, patchesRepo);
+    return await _githubAPI.latestReleaseVersion(ghPathcesOrg, patchesRepo);
   }
 
   Future<String?> getLatestManagerVersion() async {
-    return await _githubAPI.latestReleaseVersion(ghOrg, managerRepo);
+    return await _githubAPI.latestReleaseVersion(ghManagerOrg, managerRepo);
   }
 
   Future<String> getCurrentManagerVersion() async {
@@ -121,7 +123,7 @@ class ManagerAPI {
 
   Future<bool> hasAppUpdates(String packageName, DateTime patchDate) async {
     List<RepositoryCommit> commits =
-        await _githubAPI.getCommits(packageName, ghOrg, patchesRepo);
+        await _githubAPI.getCommits(packageName, ghPathcesOrg, patchesRepo);
     return commits.any((c) =>
         c.commit != null &&
         c.commit!.author != null &&
@@ -134,7 +136,7 @@ class ManagerAPI {
     DateTime patchDate,
   ) async {
     List<RepositoryCommit> commits =
-        await _githubAPI.getCommits(packageName, ghOrg, patchesRepo);
+        await _githubAPI.getCommits(packageName, ghPathcesOrg, patchesRepo);
     List<String> newCommits = commits
         .where((c) =>
             c.commit != null &&

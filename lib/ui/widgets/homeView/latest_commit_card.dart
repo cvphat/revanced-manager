@@ -78,7 +78,8 @@ class _LatestCommitCardState extends State<LatestCommitCard> {
                     ),
                   ),
                   FutureBuilder<String>(
-                    future: _githubAPI.latestCommitTime(ghOrg, managerRepo),
+                    future:
+                        _githubAPI.latestCommitTime(ghManagerOrg, managerRepo),
                     builder: (context, snapshot) => Text(
                       snapshot.hasData && snapshot.data!.isNotEmpty
                           ? FlutterI18n.translate(
