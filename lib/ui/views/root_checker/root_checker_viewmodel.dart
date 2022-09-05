@@ -10,6 +10,10 @@ class RootCheckerViewModel extends BaseViewModel {
   final ManagerAPI _managerAPI = locator<ManagerAPI>();
   bool isRooted = false;
 
+  void initialize() {
+    isRooted = _managerAPI.isRooted() ?? false;
+  }
+
   Future<void> navigateAsRoot() async {
     bool? res = await Root.isRooted();
     isRooted = res != null && res == true;
@@ -27,6 +31,6 @@ class RootCheckerViewModel extends BaseViewModel {
 
   Future<void> navigateToHome() async {
     _managerAPI.setIsRooted(isRooted);
-    _navigationService.navigateTo(Routes.navigation);
+    _navigationService.navigateTo(Routes.navigationView);
   }
 }
