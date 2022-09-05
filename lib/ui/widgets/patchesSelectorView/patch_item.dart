@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:revanced_manager/ui/widgets/patchesSelectorView/patch_options_fields.dart';
 import 'package:revanced_manager/ui/widgets/shared/patch_text_button.dart';
 
 // ignore: must_be_immutable
@@ -14,19 +15,21 @@ class PatchItem extends StatefulWidget {
   final bool isUnsupported;
   bool isSelected;
   final Function(bool) onChanged;
+  final Widget? child;
 
-  PatchItem({
-    Key? key,
-    required this.name,
-    required this.simpleName,
-    required this.description,
-    required this.version,
-    required this.packageVersion,
-    required this.supportedPackageVersions,
-    required this.isUnsupported,
-    required this.isSelected,
-    required this.onChanged,
-  }) : super(key: key);
+  PatchItem(
+      {Key? key,
+      required this.name,
+      required this.simpleName,
+      required this.description,
+      required this.version,
+      required this.packageVersion,
+      required this.supportedPackageVersions,
+      required this.isUnsupported,
+      required this.isSelected,
+      required this.onChanged,
+      this.child})
+      : super(key: key);
 
   @override
   State<PatchItem> createState() => _PatchItemState();
@@ -128,6 +131,7 @@ class _PatchItemState extends State<PatchItem> {
                     ],
                   )
                 : Container(),
+            widget.child ?? const SizedBox(),
           ],
         ),
       ),
