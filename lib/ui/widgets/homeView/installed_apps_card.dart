@@ -1,4 +1,3 @@
-import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:revanced_manager/app/app.locator.dart';
@@ -39,14 +38,17 @@ class InstalledAppsCard extends StatelessWidget {
             padding: EdgeInsets.zero,
             physics: const NeverScrollableScrollPhysics(),
             children: apps
-                .map((app) => ApplicationItem(
-                      icon: app.icon,
-                      name: app.name,
-                      patchDate: app.patchDate,
-                      changelog: app.changelog,
-                      isUpdatableApp: false,
-                      onPressed: () => DeviceApps.openApp(app.packageName),
-                    ))
+                .map(
+                  (app) => ApplicationItem(
+                    icon: app.icon,
+                    name: app.name,
+                    patchDate: app.patchDate,
+                    changelog: app.changelog,
+                    isUpdatableApp: false,
+                    onPressed: () =>
+                        locator<HomeViewModel>().navigateToAppInfo(app),
+                  ),
+                )
                 .toList(),
           );
   }

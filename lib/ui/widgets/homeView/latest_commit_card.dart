@@ -86,7 +86,7 @@ class _LatestCommitCardState extends State<LatestCommitCard> {
             future: locator<HomeViewModel>().hasManagerUpdates(),
             initialData: false,
             builder: (context, snapshot) => Opacity(
-              opacity: snapshot.hasData && snapshot.data! ? 1.0 : 1.0,
+              opacity: snapshot.hasData && snapshot.data! ? 1.0 : 0.5,
               child: CustomMaterialButton(
                 isExpanded: false,
                 label: I18nText('latestCommitCard.updateButton'),
