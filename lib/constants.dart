@@ -1,9 +1,0 @@
-String ghPathcesOrg = 'cvphat';
-String patchesRepo = 'revanced-patches';
-String ghIntegrationsOrg = 'revanced';
-String integrationsRepo = 'revanced-integrations';
-const String ghManagerOrg = 'cvphat';
-const String managerRepo = 'revanced-manager';
-const String ghOrg = 'revanced';
-const String patcherRepo = 'revanced-patcher';
-const String cliRepo = 'revanced-cli';
