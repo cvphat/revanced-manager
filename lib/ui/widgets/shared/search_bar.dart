@@ -36,6 +36,9 @@ class _SearchBarState extends State<SearchBar> {
             child: TextFormField(
               onChanged: widget.onQueryChanged,
               controller: _textController,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.secondary,
+              ),
               decoration: InputDecoration(
                 filled: true,
                 fillColor: Theme.of(context).colorScheme.secondaryContainer,
@@ -43,7 +46,7 @@ class _SearchBarState extends State<SearchBar> {
                 hintText: widget.hintText,
                 prefixIcon: Icon(
                   Icons.search,
-                  color: Theme.of(context).iconTheme.color,
+                  color: Theme.of(context).colorScheme.secondary,
                 ),
                 suffixIcon: _textController.text.isNotEmpty
                     ? IconButton(

@@ -34,13 +34,7 @@ class _LatestCommitCardState extends State<LatestCommitCard> {
             children: <Widget>[
               Row(
                 children: <Widget>[
-                  I18nText(
-                    'latestCommitCard.patcherLabel',
-                    child: const Text(
-                      '',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
+                  I18nText('latestCommitCard.patcherLabel'),
                   FutureBuilder<String>(
                     future: _githubAPI.latestCommitTime(
                       _managerAPI.getPatcherRepo(),
@@ -63,13 +57,7 @@ class _LatestCommitCardState extends State<LatestCommitCard> {
               const SizedBox(height: 8),
               Row(
                 children: <Widget>[
-                  I18nText(
-                    'latestCommitCard.managerLabel',
-                    child: const Text(
-                      '',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
+                  I18nText('latestCommitCard.managerLabel'),
                   FutureBuilder<String>(
                     future: _githubAPI.latestCommitTime(
                       _managerAPI.getManagerRepo(),
