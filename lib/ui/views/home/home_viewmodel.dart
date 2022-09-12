@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 import 'dart:io';
 import 'package:app_installer/app_installer.dart';
+import 'package:cross_connectivity/cross_connectivity.dart';
 import 'package:device_apps/device_apps.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
@@ -23,19 +24,30 @@ class HomeViewModel extends BaseViewModel {
   final NavigationService _navigationService = locator<NavigationService>();
   final ManagerAPI _managerAPI = locator<ManagerAPI>();
   final PatcherAPI _patcherAPI = locator<PatcherAPI>();
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+  final flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  DateTime? _lastUpdate;
   bool showUpdatableApps = true;
   List<PatchedApplication> patchedInstalledApps = [];
   List<PatchedApplication> patchedUpdatableApps = [];
 
-  Future<void> initialize() async {
+  Future<void> initialize(BuildContext context) async {
     await flutterLocalNotificationsPlugin.initialize(
       const InitializationSettings(
         android: AndroidInitializationSettings('ic_notification'),
       ),
       onSelectNotification: (p) => DeviceApps.openApp('app.revanced.manager'),
     );
+    bool isConnected = await Connectivity().checkConnection();
+    if (!isConnected) {
+      Fluttertoast.showToast(
+        msg: FlutterI18n.translate(
+          context,
+          'homeView.noConnection',
+        ),
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+      );
+    }
     _getPatchedApps();
     _managerAPI.reAssessSavedApps().then((_) => _getPatchedApps());
   }
@@ -61,10 +73,7 @@ class HomeViewModel extends BaseViewModel {
   }
 
   void _getPatchedApps() {
-    patchedInstalledApps = _managerAPI
-        .getPatchedApps()
-        .where((app) => app.hasUpdates == false)
-        .toList();
+    patchedInstalledApps = _managerAPI.getPatchedApps().toList();
     patchedUpdatableApps = _managerAPI
         .getPatchedApps()
         .where((app) => app.hasUpdates == true)
@@ -98,7 +107,7 @@ class HomeViewModel extends BaseViewModel {
       toastLength: Toast.LENGTH_LONG,
       gravity: ToastGravity.CENTER,
     );
-    File? managerApk = await _managerAPI.downloadManager('.apk');
+    File? managerApk = await _managerAPI.downloadManager();
     if (managerApk != null) {
       flutterLocalNotificationsPlugin.show(
         0,
@@ -169,5 +178,22 @@ class HomeViewModel extends BaseViewModel {
         ],
       ),
     );
+  }
+
+  Future<String?> getLatestPatcherReleaseTime() async {
+    return _managerAPI.getLatestPatcherReleaseTime();
+  }
+
+  Future<String?> getLatestManagerReleaseTime() async {
+    return _managerAPI.getLatestManagerReleaseTime();
+  }
+
+  Future<void> forceRefresh(BuildContext context) async {
+    await Future.delayed(const Duration(seconds: 1));
+    if (_lastUpdate == null ||
+        _lastUpdate!.difference(DateTime.now()).inSeconds > 60) {
+      _managerAPI.clearAllData();
+    }
+    initialize(context);
   }
 }
