@@ -35,7 +35,8 @@ class HomeViewModel extends BaseViewModel {
       const InitializationSettings(
         android: AndroidInitializationSettings('ic_notification'),
       ),
-      onSelectNotification: (p) => DeviceApps.openApp('app.revanced.manager'),
+      onSelectNotification: (p) =>
+          DeviceApps.openApp('app.revanced.manager.flutter'),
     );
     bool isConnected = await Connectivity().checkConnection();
     if (!isConnected) {
@@ -165,7 +166,7 @@ class HomeViewModel extends BaseViewModel {
         title: I18nText('homeView.updateDialogTitle'),
         backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
         content: I18nText('homeView.updateDialogText'),
-        actions: [
+        actions: <Widget>[
           CustomMaterialButton(
             isFilled: false,
             label: I18nText('cancelButton'),
