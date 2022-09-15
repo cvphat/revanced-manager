@@ -105,15 +105,10 @@ class InstallerViewModel extends BaseViewModel {
     update(0.0, 'Initializing...', 'Initializing installer');
     if (_patches.isNotEmpty) {
       try {
-        update(0.1, '', 'Copying original apk');
-        String inputFilePath = await _patcherAPI.copyOriginalApk(
-          _app.packageName,
-          _app.apkFilePath,
-        );
         update(0.1, '', 'Creating working directory');
         await _patcherAPI.runPatcher(
           _app.packageName,
-          inputFilePath,
+          _app.apkFilePath,
           _patches,
         );
       } catch (e) {
@@ -147,6 +142,13 @@ class InstallerViewModel extends BaseViewModel {
       update(1.0, 'Installed!', 'Installed!');
       _app.patchDate = DateTime.now();
       _app.appliedPatches = _patches.map((p) => p.name).toList();
+      bool hasMicroG = _patches.any((p) => p.name.endsWith('microg-support'));
+      if (hasMicroG) {
+        _app.packageName = _app.packageName.replaceFirst(
+          'com.google.',
+          'app.revanced.',
+        );
+      }
       await _managerAPI.savePatchedApp(_app);
     }
   }
@@ -156,7 +158,7 @@ class InstallerViewModel extends BaseViewModel {
   }
 
   void shareLog() {
-    _patcherAPI.shareLog(logs);
+    _patcherAPI.sharePatcherLog(logs);
   }
 
   Future<void> cleanPatcher() async {

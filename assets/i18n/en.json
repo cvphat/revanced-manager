@@ -23,7 +23,7 @@
         "notificationTitle": "ReVanced Manager was updated!",
         "notificationText": "Tap to open the app",
         "downloadingMessage": "Downloading update!",
-        "installingMessage": "Installing update!",
+        "installingMessage": "Installing update... Hang on!",
         "errorDownloadMessage": "Unable to download update!",
         "errorInstallMessage": "Unable to download update!",
         "noConnection": "No internet connection"
@@ -42,7 +42,9 @@
     },
     "patcherView": {
         "widgetTitle": "Patcher",
-        "patchButton": "Patch"
+        "patchButton": "Patch",
+        "patchDialogTitle": "Warning",
+        "patchDialogText": "You have selected a resource patch and a split APK installation was detected so patching errors can occur.\nAre you sure you want to proceed with patching a split base APK?"
     },
     "appSelectorCard": {
         "widgetTitle": "Select application",
@@ -111,7 +113,7 @@
         "logsLabel": "Logs",
         "logsHint": "Share device debug logs",
         "aboutLabel": "About",
-        "versionLabel": "Version"
+        "snackbarMessage": "Copied to clipboard"
     },
     "appInfoView": {
         "widgetTitle": "App Info",

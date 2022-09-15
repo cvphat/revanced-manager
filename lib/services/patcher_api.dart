@@ -82,42 +82,46 @@ class PatcherAPI {
         .toList();
   }
 
-  Future<String> copyOriginalApk(
+  Future<bool> needsIntegrations(List<Patch> selectedPatches) async {
+    return selectedPatches.any(
+      (patch) => patch.dependencies.contains('integrations'),
+    );
+  }
+
+  Future<bool> needsResourcePatching(List<Patch> selectedPatches) async {
+    return selectedPatches.any(
+      (patch) => patch.dependencies.any((dep) => dep.contains('resource-')),
+    );
+  }
+
+  Future<bool> needsSettingsPatch(List<Patch> selectedPatches) async {
+    return selectedPatches.any(
+      (patch) => patch.dependencies.contains('settings'),
+    );
+  }
+
+  Future<String> getOriginalFilePath(
     String packageName,
     String originalFilePath,
   ) async {
     bool hasRootPermissions = await _rootAPI.hasRootPermissions();
     if (hasRootPermissions) {
-      String originalRootPath = await _rootAPI.getOriginalFilePath(packageName);
-      if (File(originalRootPath).existsSync()) {
-        originalFilePath = originalRootPath;
-      }
+      originalFilePath = await _rootAPI.getOriginalFilePath(
+        packageName,
+        originalFilePath,
+      );
     }
-    String backupFilePath = '${_tmpDir.path}/$packageName.apk';
-    await patcherChannel.invokeMethod(
-      'copyOriginalApk',
-      {
-        'originalFilePath': originalFilePath,
-        'backupFilePath': backupFilePath,
-      },
-    );
-    return backupFilePath;
+    return originalFilePath;
   }
 
   Future<void> runPatcher(
     String packageName,
-    String inputFilePath,
+    String originalFilePath,
     List<Patch> selectedPatches,
   ) async {
-    bool mergeIntegrations = selectedPatches.any(
-      (patch) => patch.dependencies.contains('integrations'),
-    );
-    bool resourcePatching = selectedPatches.any(
-      (patch) => patch.dependencies.any((dep) => dep.contains('resource-')),
-    );
-    bool includeSettings = selectedPatches.any(
-      (patch) => patch.dependencies.contains('settings'),
-    );
+    bool mergeIntegrations = await needsIntegrations(selectedPatches);
+    bool resourcePatching = await needsResourcePatching(selectedPatches);
+    bool includeSettings = await needsSettingsPatch(selectedPatches);
     if (includeSettings) {
       try {
         Patch? settingsPatch = _patches.firstWhereOrNull(
@@ -140,6 +144,7 @@ class PatcherAPI {
     if (patchBundleFile != null) {
       _tmpDir.createSync();
       Directory workDir = _tmpDir.createTempSync('tmp-');
+      File inputFile = File('${workDir.path}/base.apk');
       File patchedFile = File('${workDir.path}/patched.apk');
       _outFile = File('${workDir.path}/out.apk');
       Directory cacheDir = Directory('${workDir.path}/cache');
@@ -148,7 +153,11 @@ class PatcherAPI {
         'runPatcher',
         {
           'patchBundleFilePath': patchBundleFile.path,
-          'inputFilePath': inputFilePath,
+          'originalFilePath': await getOriginalFilePath(
+            packageName,
+            originalFilePath,
+          ),
+          'inputFilePath': inputFile.path,
           'patchedFilePath': patchedFile.path,
           'outFilePath': _outFile!.path,
           'integrationsPath': mergeIntegrations ? integrationsFile!.path : '',
@@ -197,7 +206,18 @@ class PatcherAPI {
     }
   }
 
-  void shareLog(String logs) {
-    ShareExtend.share(logs, 'text');
+  Future<void> sharePatcherLog(String logs) async {
+    Directory appCache = await getTemporaryDirectory();
+    Directory logDir = Directory('${appCache.path}/logs');
+    logDir.createSync();
+    String dateTime = DateTime.now()
+        .toIso8601String()
+        .replaceAll('-', '')
+        .replaceAll(':', '')
+        .replaceAll('T', '')
+        .replaceAll('.', '');
+    File log = File('${logDir.path}/revanced-manager_patcher_$dateTime.log');
+    log.writeAsStringSync(logs);
+    ShareExtend.share(log.path, 'file');
   }
 }
