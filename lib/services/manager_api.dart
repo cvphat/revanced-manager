@@ -19,6 +19,7 @@ class ManagerAPI {
   final String patcherRepo = 'revanced-patcher';
   final String cliRepo = 'revanced-cli';
   late SharedPreferences _prefs;
+  String defaultApiUrl = 'https://revanced-releases-api.afterst0rm.xyz';
   String defaultPatcherRepo = 'revanced/revanced-patcher';
   String defaultPatchesRepo = 'cvphat/revanced-patches';
   String defaultIntegrationsRepo = 'revanced/revanced-integrations';
@@ -27,6 +28,19 @@ class ManagerAPI {
 
   Future<void> initialize() async {
     _prefs = await SharedPreferences.getInstance();
+  }
+
+  String getApiUrl() {
+    return _prefs.getString('apiUrl') ?? defaultApiUrl;
+  }
+
+  Future<void> setApiUrl(String url) async {
+    if (url.isEmpty || url == ' ') {
+      url = defaultApiUrl;
+    }
+    await _revancedAPI.initialize(url);
+    await _revancedAPI.clearAllCache();
+    await _prefs.setString('apiUrl', url);
   }
 
   String getPatchesRepo() {
@@ -83,8 +97,10 @@ class ManagerAPI {
   Future<void> savePatchedApp(PatchedApplication app) async {
     List<PatchedApplication> patchedApps = getPatchedApps();
     patchedApps.removeWhere((a) => a.packageName == app.packageName);
-    ApplicationWithIcon? installed =
-        await DeviceApps.getApp(app.packageName, true) as ApplicationWithIcon?;
+    ApplicationWithIcon? installed = await DeviceApps.getApp(
+      app.packageName,
+      true,
+    ) as ApplicationWithIcon?;
     if (installed != null) {
       app.name = installed.appName;
       app.version = installed.versionName!;
@@ -110,10 +126,11 @@ class ManagerAPI {
   }
 
   Future<List<Patch>> getPatches() async {
-    if (getPatchesRepo() == defaultPatchesRepo) {
+    String repoName = getPatchesRepo();
+    if (repoName == defaultPatchesRepo) {
       return await _revancedAPI.getPatches();
     } else {
-      return await _githubAPI.getPatches(getPatchesRepo());
+      return await _githubAPI.getPatches(repoName);
     }
   }
 
@@ -187,9 +204,10 @@ class ManagerAPI {
       List<String> installedApps = await _rootAPI.getInstalledApps();
       for (String packageName in installedApps) {
         if (!patchedApps.any((app) => app.packageName == packageName)) {
-          ApplicationWithIcon? application =
-              await DeviceApps.getApp(packageName, true)
-                  as ApplicationWithIcon?;
+          ApplicationWithIcon? application = await DeviceApps.getApp(
+            packageName,
+            true,
+          ) as ApplicationWithIcon?;
           if (application != null) {
             unsavedApps.add(
               PatchedApplication(
@@ -214,9 +232,10 @@ class ManagerAPI {
       if (app.packageName.startsWith('app.revanced') &&
           !app.packageName.startsWith('app.revanced.manager.') &&
           !patchedApps.any((uapp) => uapp.packageName == app.packageName)) {
-        ApplicationWithIcon? application =
-            await DeviceApps.getApp(app.packageName, true)
-                as ApplicationWithIcon?;
+        ApplicationWithIcon? application = await DeviceApps.getApp(
+          app.packageName,
+          true,
+        ) as ApplicationWithIcon?;
         if (application != null) {
           unsavedApps.add(
             PatchedApplication(
