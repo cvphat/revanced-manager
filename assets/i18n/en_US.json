@@ -13,6 +13,7 @@
     "homeView": {
         "widgetTitle": "Dashboard",
         "updatesSubtitle": "Updates",
+        "patchesStatusSubtitle": "Patches Status",
         "patchedSubtitle": "Patched Applications",
         "updatesAvailable": "Updates available",
         "noUpdates": "No updates available",
@@ -26,7 +27,8 @@
         "installingMessage": "Installing update...",
         "errorDownloadMessage": "Unable to download update",
         "errorInstallMessage": "Unable to install update",
-        "noConnection": "No internet connection"
+        "noConnection": "No internet connection",
+        "warningLoadLocalPatches": "Please select a patches json file to load"
     },
     "applicationItem": {
         "patchButton": "Patch",
@@ -40,11 +42,20 @@
         "managerLabel": "Manager: ",
         "updateButton": "Update Manager"
     },
+    "latestPatchesCard": {
+        "failedStatusLabel": "Load Failed",
+        "loadedStatusLabel": "Loaded",
+        "patchesLabel": "Patches Status: ",
+        "statusLabel": "Status: ",
+        "loadButton": "Load Patch"
+    },
     "patcherView": {
         "widgetTitle": "Patcher",
         "patchButton": "Patch",
         "patchDialogTitle": "Warning",
-        "patchDialogText": "You have selected a resource patch and a split APK installation was detected so patching errors may occur.\nAre you sure you want to proceed with patching a split base APK?"
+        "patchDialogText": "You have selected a resource patch and a split APK installation was detected so patching errors may occur.\nAre you sure you want to proceed with patching a split base APK?",
+        "patchJarMissingTitle": "Warning",
+        "patchJarMissingText": "Fail to download patches library (-_-)"
     },
     "appSelectorCard": {
         "widgetTitle": "Select application",

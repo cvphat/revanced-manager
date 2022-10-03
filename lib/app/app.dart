@@ -33,6 +33,7 @@ import 'package:stacked_services/stacked_services.dart';
     LazySingleton(classType: HomeViewModel),
     LazySingleton(classType: PatcherViewModel),
     LazySingleton(classType: NavigationService),
+    LazySingleton(classType: DialogService),
     LazySingleton(classType: ManagerAPI),
     LazySingleton(classType: PatcherAPI),
     LazySingleton(classType: RevancedAPI),

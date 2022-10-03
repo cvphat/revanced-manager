@@ -1,8 +1,12 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:app_installer/app_installer.dart';
 import 'package:collection/collection.dart';
 import 'package:device_apps/device_apps.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:injectable/injectable.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:revanced_manager/app/app.locator.dart';
@@ -11,17 +15,21 @@ import 'package:revanced_manager/models/patched_application.dart';
 import 'package:revanced_manager/services/manager_api.dart';
 import 'package:revanced_manager/services/root_api.dart';
 import 'package:share_extend/share_extend.dart';
+import 'package:stacked_services/stacked_services.dart';
 
 @lazySingleton
 class PatcherAPI {
   static const patcherChannel =
       MethodChannel('app.revanced.manager.flutter/patcher');
+  final DialogService _dialogSvc = locator<DialogService>();
   final ManagerAPI _managerAPI = locator<ManagerAPI>();
   final RootAPI _rootAPI = RootAPI();
   late Directory _tmpDir;
   late File _keyStoreFile;
   List<Patch> _patches = [];
   File? _outFile;
+
+  bool get noPatchesLoaded => _patches.isEmpty;
 
   Future<void> initialize() async {
     await _loadPatches();
@@ -41,6 +49,22 @@ class PatcherAPI {
     try {
       if (_patches.isEmpty) {
         _patches = await _managerAPI.getPatches();
+      }
+    } on Exception {
+      _patches = List.empty();
+    }
+  }
+
+  Future<void> loadLocalPatches() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+      );
+      if (result != null && result.files.single.path != null) {
+        final f = File(result.files.single.path!);
+        List<dynamic> list = jsonDecode(f.readAsStringSync());
+        _patches = list.map((patch) => Patch.fromJson(patch)).toList();
       }
     } on Exception {
       _patches = List.empty();
@@ -140,6 +164,7 @@ class PatcherAPI {
     String packageName,
     String originalFilePath,
     List<Patch> selectedPatches,
+    BuildContext context,
   ) async {
     bool mergeIntegrations = await needsIntegrations(selectedPatches);
     bool resourcePatching = await needsResourcePatching(selectedPatches);
@@ -159,6 +184,19 @@ class PatcherAPI {
       }
     }
     File? patchBundleFile = await _managerAPI.downloadPatches();
+    if (patchBundleFile == null) {
+      final response = await _dialogSvc.showConfirmationDialog(
+        title:
+            // ignore: use_build_context_synchronously
+            FlutterI18n.translate(context, 'patcherView.patchJarMissingTitle'),
+        description:
+            // ignore: use_build_context_synchronously
+            FlutterI18n.translate(context, 'patcherView.patchJarMissingText'),
+      );
+      if (response != null && response.confirmed) {
+        patchBundleFile = await selectJarFromStorage();
+      }
+    }
     File? integrationsFile;
     if (mergeIntegrations) {
       integrationsFile = await _managerAPI.downloadIntegrations();
@@ -268,5 +306,20 @@ class PatcherAPI {
       return (versions.keys.toList()..sort()).last;
     }
     return '';
+  }
+
+  Future<File?> selectJarFromStorage() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['jar'],
+      );
+      if (result != null && result.files.single.path != null) {
+        return File(result.files.single.path!);
+      }
+    } on Exception {
+      return null;
+    }
+    return null;
   }
 }

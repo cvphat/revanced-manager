@@ -32,6 +32,8 @@ class HomeViewModel extends BaseViewModel {
   List<PatchedApplication> patchedInstalledApps = [];
   List<PatchedApplication> patchedUpdatableApps = [];
 
+  get noPatchesLoaded => _patcherAPI.noPatchesLoaded;
+
   Future<void> initialize(BuildContext context) async {
     await flutterLocalNotificationsPlugin.initialize(
       const InitializationSettings(
@@ -50,6 +52,9 @@ class HomeViewModel extends BaseViewModel {
     }
     _getPatchedApps();
     _managerAPI.reAssessSavedApps().then((_) => _getPatchedApps());
+    if (_patcherAPI.noPatchesLoaded) {
+      // _toast.show();
+    }
   }
 
   void navigateToAppInfo(PatchedApplication app) {
@@ -180,5 +185,12 @@ class HomeViewModel extends BaseViewModel {
       _managerAPI.clearAllData();
     }
     initialize(context);
+  }
+
+  void loadLocalPatches() async {
+    _toast.show('homeView.warningLoadLocalPatches');
+    await Future.delayed(const Duration(seconds: 2));
+    await _patcherAPI.loadLocalPatches();
+    notifyListeners();
   }
 }

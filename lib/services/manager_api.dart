@@ -21,7 +21,7 @@ class ManagerAPI {
   late SharedPreferences _prefs;
   String defaultApiUrl = 'https://revanced-releases-api.afterst0rm.xyz';
   String defaultPatcherRepo = 'revanced/revanced-patcher';
-  String defaultPatchesRepo = 'cvphat/revanced-patches';
+  String defaultPatchesRepo = 'revanced/revanced-patches';
   String defaultIntegrationsRepo = 'revanced/revanced-integrations';
   String defaultCliRepo = 'revanced/revanced-cli';
   String defaultManagerRepo = 'revanced/revanced-manager';
