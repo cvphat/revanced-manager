@@ -19,7 +19,7 @@ class ManagerAPI {
   final String patcherRepo = 'revanced-patcher';
   final String cliRepo = 'revanced-cli';
   late SharedPreferences _prefs;
-  String defaultApiUrl = 'https://revanced-releases-api.afterst0rm.xyz';
+  String defaultApiUrl = 'https://releases.rvcd.win/';
   String defaultPatcherRepo = 'revanced/revanced-patcher';
   String defaultPatchesRepo = 'revanced/revanced-patches';
   String defaultIntegrationsRepo = 'revanced/revanced-integrations';
@@ -314,7 +314,7 @@ class ManagerAPI {
       newCommits = await _githubAPI.getCommits(
         packageName,
         getPatchesRepo(),
-        DateTime(2022, 3, 20, 21, 06, 01),
+        patchDate,
       );
     }
     return newCommits;
