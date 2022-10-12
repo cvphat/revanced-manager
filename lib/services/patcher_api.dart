@@ -24,6 +24,7 @@ class PatcherAPI {
   final DialogService _dialogSvc = locator<DialogService>();
   final ManagerAPI _managerAPI = locator<ManagerAPI>();
   final RootAPI _rootAPI = RootAPI();
+  late Directory _dataDir;
   late Directory _tmpDir;
   late File _keyStoreFile;
   List<Patch> _patches = [];
@@ -34,8 +35,9 @@ class PatcherAPI {
   Future<void> initialize() async {
     await _loadPatches();
     Directory appCache = await getTemporaryDirectory();
+    _dataDir = await getExternalStorageDirectory() ?? appCache;
     _tmpDir = Directory('${appCache.path}/patcher');
-    _keyStoreFile = File('${appCache.path}/revanced-manager.keystore');
+    _keyStoreFile = File('${_dataDir.path}/revanced-manager.keystore');
     cleanPatcher();
   }
 
@@ -94,14 +96,10 @@ class PatcherAPI {
   }
 
   Future<List<Patch>> getFilteredPatches(String packageName) async {
-    String newPackageName = packageName.replaceFirst(
-      'app.revanced.',
-      'com.google.',
-    );
     return _patches
         .where((patch) =>
             !patch.name.contains('settings') &&
-            patch.compatiblePackages.any((pack) => pack.name == newPackageName))
+            patch.compatiblePackages.any((pack) => pack.name == packageName))
         .toList();
   }
 
@@ -201,6 +199,7 @@ class PatcherAPI {
       integrationsFile = await _managerAPI.downloadIntegrations();
     }
     if (patchBundleFile != null) {
+      _dataDir.createSync();
       _tmpDir.createSync();
       Directory workDir = _tmpDir.createTempSync('tmp-');
       File inputFile = File('${workDir.path}/base.apk');

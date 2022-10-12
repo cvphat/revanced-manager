@@ -153,13 +153,15 @@
         "rootDialogTitle": "Error",
         "rootDialogText": "App was installed with root mode enabled but currently root mode is disabled.\nPlease enable root mode first.",
         "packageNameLabel": "Package Name",
+        "originalPackageNameLabel": "Original Package Name",
         "installTypeLabel": "Installation Type",
         "rootTypeLabel": "Root",
         "nonRootTypeLabel": "Non-root",
         "patchedDateLabel": "Patched Date",
         "patchedDateHint": "{date} at {time}",
         "appliedPatchesLabel": "Applied Patches",
-        "appliedPatchesHint": "{quantity} applied patches"
+        "appliedPatchesHint": "{quantity} applied patches",
+        "updateNotImplemented": "Update functionality not implemented yet"
     },
     "contributorsView": {
         "widgetTitle": "Contributors",

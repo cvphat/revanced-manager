@@ -7,12 +7,11 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:injectable/injectable.dart';
 import 'package:native_dio_client/native_dio_client.dart';
 import 'package:revanced_manager/models/patch.dart';
+import 'package:revanced_manager/utils/check_for_gms.dart';
 
 @lazySingleton
 class GithubAPI {
-  final Dio _dio = Dio(
-    BaseOptions(baseUrl: 'https://api.github.com'),
-  )..httpClientAdapter = NativeAdapter();
+  late Dio _dio = Dio();
   final DioCacheManager _dioCacheManager = DioCacheManager(CacheConfig());
   final Options _cacheOptions = buildCacheOptions(
     const Duration(hours: 6),
@@ -20,16 +19,30 @@ class GithubAPI {
   );
   final Map<String, String> repoAppPath = {
     'com.google.android.youtube': 'youtube',
-    'app.revanced.android.youtube': 'youtube',
     'com.google.android.apps.youtube.music': 'music',
     'com.twitter.android': 'twitter',
     'com.reddit.frontpage': 'reddit',
     'com.zhiliaoapp.musically': 'tiktok',
     'de.dwd.warnapp': 'warnwetter',
     'com.garzotto.pflotsh.ecmwf_a': 'ecmwf',
+    'com.spotify.music': 'spotify',
   };
 
-  void initialize() {
+  void initialize() async {
+    bool isGMSInstalled = await checkForGMS();
+
+    if (!isGMSInstalled) {
+      _dio = Dio(BaseOptions(
+        baseUrl: 'https://api.github.com',
+      ));
+      print('GitHub API: Using default engine + $isGMSInstalled');
+    } else {
+      _dio = Dio(BaseOptions(
+        baseUrl: 'https://api.github.com',
+      ))
+        ..httpClientAdapter = NativeAdapter();
+      print('ReVanced API: Using CronetEngine + $isGMSInstalled');
+    }
     _dio.interceptors.add(_dioCacheManager.interceptor);
   }
 
