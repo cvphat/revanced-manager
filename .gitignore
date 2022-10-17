@@ -20,6 +20,7 @@
 .classpath
 .project
 .settings/
+.fvm/
 
 # Flutter repo-specific
 /bin/cache/
@@ -136,3 +137,6 @@ app.*.map.json
 
 Firebase related
 .firebase
+
+# Environment variables
+android/app/google-services.json

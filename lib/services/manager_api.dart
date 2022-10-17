@@ -9,6 +9,7 @@ import 'package:revanced_manager/models/patched_application.dart';
 import 'package:revanced_manager/services/github_api.dart';
 import 'package:revanced_manager/services/revanced_api.dart';
 import 'package:revanced_manager/services/root_api.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 @lazySingleton
@@ -81,6 +82,37 @@ class ManagerAPI {
     await _prefs.setBool('useDarkTheme', value);
   }
 
+  bool isSentryEnabled() {
+    return _prefs.getBool('sentryEnabled') ?? true;
+  }
+
+  Future<void> setSentryStatus(bool value) async {
+    await _prefs.setBool('sentryEnabled', value);
+  }
+
+  bool isCrashlyticsEnabled() {
+    return _prefs.getBool('crashlyticsEnabled') ?? true;
+  }
+
+  Future<void> setCrashlyticsStatus(bool value) async {
+    await _prefs.setBool('crashlyticsEnabled', value);
+  }
+
+  Future<void> deleteTempFolder() async {
+    final Directory dir = Directory('/data/local/tmp/revanced-manager');
+    if (await dir.exists()) {
+      await dir.delete(recursive: true);
+    }
+  }
+
+  Future<void> deleteKeystore() async {
+    final File keystore = File(
+        '/sdcard/Android/data/app.revanced.manager.flutter/files/revanced-keystore.keystore');
+    if (await keystore.exists()) {
+      await keystore.delete();
+    }
+  }
+
   List<PatchedApplication> getPatchedApps() {
     List<String> apps = _prefs.getStringList('patchedApps') ?? [];
     return apps.map((a) => PatchedApplication.fromJson(jsonDecode(a))).toList();
@@ -116,9 +148,13 @@ class ManagerAPI {
     await setPatchedApps(patchedApps);
   }
 
-  void clearAllData() {
-    _revancedAPI.clearAllCache();
-    _githubAPI.clearAllCache();
+  void clearAllData() async {
+    try {
+      _revancedAPI.clearAllCache();
+      _githubAPI.clearAllCache();
+    } on Exception catch (e, s) {
+      await Sentry.captureException(e, stackTrace: s);
+    }
   }
 
   Future<Map<String, List<dynamic>>> getContributors() async {
@@ -126,35 +162,50 @@ class ManagerAPI {
   }
 
   Future<List<Patch>> getPatches() async {
-    String repoName = getPatchesRepo();
-    if (repoName == defaultPatchesRepo) {
-      return await _revancedAPI.getPatches();
-    } else {
-      return await _githubAPI.getPatches(repoName);
+    try {
+      String repoName = getPatchesRepo();
+      if (repoName == defaultPatchesRepo) {
+        return await _revancedAPI.getPatches();
+      } else {
+        return await _githubAPI.getPatches(repoName);
+      }
+    } on Exception catch (e, s) {
+      await Sentry.captureException(e, stackTrace: s);
+      return [];
     }
   }
 
   Future<File?> downloadPatches() async {
-    String repoName = getPatchesRepo();
-    if (repoName == defaultPatchesRepo) {
-      return await _revancedAPI.getLatestReleaseFile(
-        '.jar',
-        defaultPatchesRepo,
-      );
-    } else {
-      return await _githubAPI.getLatestReleaseFile('.jar', repoName);
+    try {
+      String repoName = getPatchesRepo();
+      if (repoName == defaultPatchesRepo) {
+        return await _revancedAPI.getLatestReleaseFile(
+          '.jar',
+          defaultPatchesRepo,
+        );
+      } else {
+        return await _githubAPI.getLatestReleaseFile('.jar', repoName);
+      }
+    } on Exception catch (e, s) {
+      await Sentry.captureException(e, stackTrace: s);
+      return null;
     }
   }
 
   Future<File?> downloadIntegrations() async {
-    String repoName = getIntegrationsRepo();
-    if (repoName == defaultIntegrationsRepo) {
-      return await _revancedAPI.getLatestReleaseFile(
-        '.apk',
-        defaultIntegrationsRepo,
-      );
-    } else {
-      return await _githubAPI.getLatestReleaseFile('.apk', repoName);
+    try {
+      String repoName = getIntegrationsRepo();
+      if (repoName == defaultIntegrationsRepo) {
+        return await _revancedAPI.getLatestReleaseFile(
+          '.apk',
+          defaultIntegrationsRepo,
+        );
+      } else {
+        return await _githubAPI.getLatestReleaseFile('.apk', repoName);
+      }
+    } on Exception catch (e, s) {
+      await Sentry.captureException(e, stackTrace: s);
+      return null;
     }
   }
 
@@ -174,6 +225,13 @@ class ManagerAPI {
     return await _revancedAPI.getLatestReleaseVersion(
       '.apk',
       defaultManagerRepo,
+    );
+  }
+
+  Future<String?> getLatestPatchesVersion() async {
+    return await _revancedAPI.getLatestReleaseVersion(
+      '.json',
+      defaultPatchesRepo,
     );
   }
 
