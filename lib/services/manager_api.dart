@@ -82,21 +82,13 @@ class ManagerAPI {
     await _prefs.setBool('useDarkTheme', value);
   }
 
-  bool isSentryEnabled() {
-    return _prefs.getBool('sentryEnabled') ?? true;
-  }
+  // bool isSentryEnabled() {
+  //   return _prefs.getBool('sentryEnabled') ?? true;
+  // }
 
-  Future<void> setSentryStatus(bool value) async {
-    await _prefs.setBool('sentryEnabled', value);
-  }
-
-  bool isCrashlyticsEnabled() {
-    return _prefs.getBool('crashlyticsEnabled') ?? true;
-  }
-
-  Future<void> setCrashlyticsStatus(bool value) async {
-    await _prefs.setBool('crashlyticsEnabled', value);
-  }
+  // Future<void> setSentryStatus(bool value) async {
+  //   await _prefs.setBool('sentryEnabled', value);
+  // }
 
   Future<void> deleteTempFolder() async {
     final Directory dir = Directory('/data/local/tmp/revanced-manager');
@@ -107,7 +99,7 @@ class ManagerAPI {
 
   Future<void> deleteKeystore() async {
     final File keystore = File(
-        '/sdcard/Android/data/app.revanced.manager.flutter/files/revanced-keystore.keystore');
+        '/sdcard/Android/data/app.revanced.manager.flutter/files/revanced-manager.keystore');
     if (await keystore.exists()) {
       await keystore.delete();
     }

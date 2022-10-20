@@ -17,6 +17,7 @@
         "patchedSubtitle": "Patched Applications",
         "updatesAvailable": "Updates available",
         "noUpdates": "No updates available",
+        "WIP": "Work In Progress",
         "noInstallations": "No patched applications installed",
         "installed": "Installed",
         "updateDialogTitle": "Update Manager",
@@ -28,7 +29,8 @@
         "errorDownloadMessage": "Unable to download update",
         "errorInstallMessage": "Unable to install update",
         "noConnection": "No internet connection",
-        "warningLoadLocalPatches": "Please select a patches json file to load"
+        "warningLoadLocalPatches": "Please select a patches json file to load",
+        "updatesDisabled": "Updating a patched app is currently disabled. Repatch the app again."
     },
     "applicationItem": {
         "patchButton": "Patch",
@@ -145,8 +147,6 @@
         "snackbarMessage": "Copied to clipboard",
         "sentryLabel": "Sentry Logging",
         "sentryHint": "Send anonymous logs to help us improve ReVanced Manager",
-        "firebaseCrashlyticsLabel": "Firebase Crashlytics",
-        "firebaseCrashlyticsHint": "Send anonymous crash reports to help us improve ReVanced Manager",
         "restartAppForChanges": "Restart the app to apply changes",
         "deleteKeystoreLabel": "Delete keystore",
         "deleteKeystoreHint": "Delete the keystore used to sign the app",

@@ -4,7 +4,7 @@ homepage: https://github.com/revanced/revanced-manager
 
 publish_to: 'none'
 
-version: 0.0.33+33
+version: 0.0.36+36
 
 environment:
   sdk: ">=2.17.5 <3.0.0"
@@ -73,8 +73,6 @@ dependencies:
   url_launcher: ^6.1.5
   wakelock: ^0.6.2
   sentry_dio: ^6.12.2
-  firebase_core: ^1.24.0
-  firebase_crashlytics: ^2.9.0
   flutter_dotenv: ^5.0.2
 
 dev_dependencies:
@@ -92,3 +90,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/i18n/
+    - .env

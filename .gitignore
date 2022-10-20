@@ -137,6 +137,3 @@ app.*.map.json
 
 Firebase related
 .firebase
-
-# Environment variables
-android/app/google-services.json
