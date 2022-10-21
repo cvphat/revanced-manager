@@ -35,10 +35,10 @@ class ManagerAPI {
     return _prefs.getString('githubToken');
   }
 
-  Future<void> setGithubToken(String? token) async {
+  Future<void> setGithubToken(String token) async {
     await _prefs.setString('githubToken', token);
   }
-  
+
   String getApiUrl() {
     return _prefs.getString('apiUrl') ?? defaultApiUrl;
   }

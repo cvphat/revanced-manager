@@ -280,7 +280,7 @@ class SettingsViewModel extends BaseViewModel {
                 ),
                 inputController: _githubTokenController,
                 label: I18nText('settingsView.githubTokenLabel'),
-                hint: FlutterI18n.translate(context, 'settingsView.githubTokenHint'),
+                hint: token ?? '',
                 obscureText: true,
                 onChanged: (value) => notifyListeners(),
               ),
