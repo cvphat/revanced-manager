@@ -6,6 +6,7 @@ class CustomTextField extends StatelessWidget {
   final String hint;
   final Widget? leadingIcon;
   final Function(String)? onChanged;
+  final bool obscureText;
 
   const CustomTextField({
     Key? key,
@@ -14,6 +15,7 @@ class CustomTextField extends StatelessWidget {
     required this.hint,
     this.leadingIcon,
     required this.onChanged,
+    this.obscureText = false,
   }) : super(key: key);
 
   @override
@@ -21,6 +23,7 @@ class CustomTextField extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 4.0),
       child: TextField(
+        obscureText: obscureText,
         controller: inputController,
         onChanged: onChanged,
         keyboardType: TextInputType.text,

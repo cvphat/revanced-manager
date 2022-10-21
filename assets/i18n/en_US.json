@@ -142,6 +142,8 @@
         "logsHint": "Share device debug logs",
         "apiURLLabel": "API URL",
         "apiURLHint": "Configure your custom API URL",
+        "githubTokenLabel": "Github Token",
+        "githubTokenHint": "Set your github token to load patches without 403 error",
         "selectApiURL": "Select URL",
         "aboutLabel": "About",
         "snackbarMessage": "Copied to clipboard",

@@ -25,12 +25,20 @@ class ManagerAPI {
   String defaultPatchesRepo = 'revanced/revanced-patches';
   String defaultIntegrationsRepo = 'revanced/revanced-integrations';
   String defaultCliRepo = 'revanced/revanced-cli';
-  String defaultManagerRepo = 'revanced/revanced-manager';
+  String defaultManagerRepo = 'cvphat/revanced-manager';
 
   Future<void> initialize() async {
     _prefs = await SharedPreferences.getInstance();
   }
 
+  String? getGithubToken() {
+    return _prefs.getString('githubToken');
+  }
+
+  Future<void> setGithubToken(String? token) async {
+    await _prefs.setString('githubToken', token);
+  }
+  
   String getApiUrl() {
     return _prefs.getString('apiUrl') ?? defaultApiUrl;
   }

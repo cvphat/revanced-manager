@@ -136,6 +136,12 @@ class SettingsView extends StatelessWidget {
                         subtitle: 'settingsView.sourcesLabelHint',
                         onTap: () => model.showSourcesDialog(context),
                       ),
+                      SettingsTileDialog(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                        title: 'settingsView.githubTokenLabel',
+                        subtitle: 'settingsView.githubTokenHint',
+                        onTap: () => model.showGithubTokenDialog(context),
+                      ),
                       ListTile(
                         contentPadding:
                             const EdgeInsets.symmetric(horizontal: 20.0),

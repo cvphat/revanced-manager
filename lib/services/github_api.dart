@@ -10,6 +10,7 @@ import 'package:revanced_manager/models/patch.dart';
 import 'package:revanced_manager/utils/check_for_gms.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:sentry_dio/sentry_dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 @lazySingleton
 class GithubAPI {
@@ -33,16 +34,17 @@ class GithubAPI {
   void initialize() async {
     try {
       bool isGMSInstalled = await checkForGMS();
-
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('githubToken');
+      final baseOptions = BaseOptions(baseUrl: 'https://api.github.com');
+      if(token != null) {
+        baseOptions.headers.addAll({"Authorization": "Bearer $token"});
+      }
       if (!isGMSInstalled) {
-        _dio = Dio(BaseOptions(
-          baseUrl: 'https://api.github.com',
-        ));
+        _dio = Dio(baseOptions);
         print('GitHub API: Using default engine + $isGMSInstalled');
       } else {
-        _dio = Dio(BaseOptions(
-          baseUrl: 'https://api.github.com',
-        ))
+        _dio = Dio(baseOptions)
           ..httpClientAdapter = NativeAdapter();
         print('ReVanced API: Using CronetEngine + $isGMSInstalled');
       }
