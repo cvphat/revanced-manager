@@ -21,6 +21,7 @@
 .project
 .settings/
 .fvm/
+.vscode/
 
 # Flutter repo-specific
 /bin/cache/

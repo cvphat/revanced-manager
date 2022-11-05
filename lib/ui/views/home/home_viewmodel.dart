@@ -33,7 +33,9 @@ class HomeViewModel extends BaseViewModel {
   List<PatchedApplication> patchedInstalledApps = [];
   List<PatchedApplication> patchedUpdatableApps = [];
 
+  String? _patchesVersion;
   get noPatchesLoaded => _patcherAPI.noPatchesLoaded;
+  String? get patchesVersion => _patchesVersion;
 
   Future<void> initialize(BuildContext context) async {
     await flutterLocalNotificationsPlugin.initialize(
@@ -56,6 +58,7 @@ class HomeViewModel extends BaseViewModel {
     if (_patcherAPI.noPatchesLoaded) {
       // _toast.show();
     }
+    _patchesVersion = await _managerAPI.getLatestPatchesVersion();
   }
 
   void navigateToAppInfo(PatchedApplication app) {
