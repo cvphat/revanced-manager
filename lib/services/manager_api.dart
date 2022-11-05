@@ -20,7 +20,7 @@ class ManagerAPI {
   final String patcherRepo = 'revanced-patcher';
   final String cliRepo = 'revanced-cli';
   late SharedPreferences _prefs;
-  String defaultApiUrl = 'https://releases.rvcd.win/';
+  String defaultApiUrl = 'https://releases.revanced.app/';
   String defaultPatcherRepo = 'revanced/revanced-patcher';
   String defaultPatchesRepo = 'revanced/revanced-patches';
   String defaultIntegrationsRepo = 'revanced/revanced-integrations';
@@ -97,6 +97,14 @@ class ManagerAPI {
   // Future<void> setSentryStatus(bool value) async {
   //   await _prefs.setBool('sentryEnabled', value);
   // }
+
+  bool areExperimentalPatchesEnabled() {
+    return _prefs.getBool('experimentalPatchesEnabled') ?? false;
+  }
+
+  Future<void> enableExperimentalPatchesStatus(bool value) async {
+    await _prefs.setBool('experimentalPatchesEnabled', value);
+  }
 
   Future<void> deleteTempFolder() async {
     final Directory dir = Directory('/data/local/tmp/revanced-manager');
@@ -210,7 +218,7 @@ class ManagerAPI {
   }
 
   Future<File?> downloadManager() async {
-    return await _revancedAPI.getLatestReleaseFile('.apk', defaultManagerRepo);
+    return await _githubAPI.getLatestReleaseFile('.apk', defaultManagerRepo);
   }
 
   Future<String?> getLatestPatcherReleaseTime() async {
@@ -218,11 +226,11 @@ class ManagerAPI {
   }
 
   Future<String?> getLatestManagerReleaseTime() async {
-    return await _revancedAPI.getLatestReleaseTime('.apk', defaultManagerRepo);
+    return await _githubAPI.getLatestReleaseTime('.apk', defaultManagerRepo);
   }
 
   Future<String?> getLatestManagerVersion() async {
-    return await _revancedAPI.getLatestReleaseVersion(
+    return await _githubAPI.getLatestReleaseVersion(
       '.apk',
       defaultManagerRepo,
     );

@@ -218,6 +218,14 @@ class InstallerViewModel extends BaseViewModel {
     }
   }
 
+  void exportResult() {
+    try {
+      _patcherAPI.exportPatchedFile(_app.name, _app.version);
+    } on Exception catch (e, s) {
+      Sentry.captureException(e, stackTrace: s);
+    }
+  }
+
   void shareResult() {
     try {
       _patcherAPI.sharePatchedFile(_app.name, _app.version);
@@ -251,6 +259,9 @@ class InstallerViewModel extends BaseViewModel {
         shareResult();
         break;
       case 1:
+        exportResult();
+        break;
+      case 2:
         shareLog();
         break;
     }

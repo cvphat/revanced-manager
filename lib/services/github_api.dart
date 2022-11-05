@@ -7,10 +7,9 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:injectable/injectable.dart';
 import 'package:native_dio_client/native_dio_client.dart';
 import 'package:revanced_manager/models/patch.dart';
-import 'package:revanced_manager/utils/check_for_gms.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:sentry_dio/sentry_dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timeago/timeago.dart';
 
 @lazySingleton
 class GithubAPI {
@@ -33,21 +32,10 @@ class GithubAPI {
 
   void initialize() async {
     try {
-      bool isGMSInstalled = await checkForGMS();
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('githubToken');
-      final baseOptions = BaseOptions(baseUrl: 'https://api.github.com');
-      if(token != null) {
-        baseOptions.headers.addAll({"Authorization": "Bearer $token"});
-      }
-      if (!isGMSInstalled) {
-        _dio = Dio(baseOptions);
-        print('GitHub API: Using default engine + $isGMSInstalled');
-      } else {
-        _dio = Dio(baseOptions)
-          ..httpClientAdapter = NativeAdapter();
-        print('ReVanced API: Using CronetEngine + $isGMSInstalled');
-      }
+      _dio = Dio(BaseOptions(
+        baseUrl: 'https://api.github.com',
+      ))..httpClientAdapter = NativeAdapter();
+
       _dio.interceptors.add(_dioCacheManager.interceptor);
       _dio.addSentry(
         captureFailedRequests: true,
@@ -143,5 +131,42 @@ class GithubAPI {
       return List.empty();
     }
     return patches;
+  }
+
+  Future<String?> getLatestReleaseVersion(
+    String extension,
+    String repoName,
+  ) async {
+    try {
+      Map<String, dynamic>? release = await _getLatestRelease(
+        repoName,
+      );
+      if (release != null) {
+        return release['name'];
+      }
+    } on Exception catch (e, s) {
+      await Sentry.captureException(e, stackTrace: s);
+      return null;
+    }
+    return null;
+  }
+
+  Future<String?> getLatestReleaseTime(
+    String extension,
+    String repoName,
+  ) async {
+    try {
+      Map<String, dynamic>? release = await _getLatestRelease(
+        repoName,
+      );
+      if (release != null) {
+        DateTime timestamp = DateTime.parse(release['published_at'] as String);
+        return format(timestamp, locale: 'en_short');
+      }
+    } on Exception catch (e, s) {
+      await Sentry.captureException(e, stackTrace: s);
+      return null;
+    }
+    return null;
   }
 }

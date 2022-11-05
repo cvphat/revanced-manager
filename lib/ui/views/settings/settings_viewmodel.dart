@@ -30,7 +30,6 @@ class SettingsViewModel extends BaseViewModel {
   final TextEditingController _orgIntSourceController = TextEditingController();
   final TextEditingController _intSourceController = TextEditingController();
   final TextEditingController _apiUrlController = TextEditingController();
-  final TextEditingController _githubTokenController = TextEditingController();
 
   void setLanguage(String language) {
     notifyListeners();
@@ -263,52 +262,6 @@ class SettingsViewModel extends BaseViewModel {
     );
   }
 
-  Future<void> showGithubTokenDialog(BuildContext context) async {
-    String? token = _managerAPI.getGithubToken();
-    return showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: I18nText('settingsView.githubTokenLabel'),
-        backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-        content: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              CustomTextField(
-                leadingIcon: Icon(
-                  Icons.token_outlined,
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
-                inputController: _githubTokenController,
-                label: I18nText('settingsView.githubTokenLabel'),
-                hint: token ?? '',
-                obscureText: true,
-                onChanged: (value) => notifyListeners(),
-              ),
-            ],
-          ),
-        ),
-        actions: <Widget>[
-          CustomMaterialButton(
-            isFilled: false,
-            label: I18nText('cancelButton'),
-            onPressed: () {
-              _githubTokenController.clear();
-              Navigator.of(context).pop();
-            },
-          ),
-          CustomMaterialButton(
-            label: I18nText('okButton'),
-            onPressed: () {
-              String token = _githubTokenController.text;
-              _managerAPI.setGithubToken(token);
-              Navigator.of(context).pop();
-            },
-          )
-        ],
-      ),
-    );
-  }
-
   Future<void> showResetConfirmationDialog(BuildContext context) async {
     return showDialog(
       context: context,
@@ -371,6 +324,16 @@ class SettingsViewModel extends BaseViewModel {
   //   _toast.showBottom('settingsView.restartAppForChanges');
   //   notifyListeners();
   // }
+
+  bool areExperimentalPatchesEnabled() {
+    return _managerAPI.areExperimentalPatchesEnabled();
+  }
+
+  void useExperimentalPatches(bool value) {
+    _managerAPI.enableExperimentalPatchesStatus(value);
+    _toast.showBottom('settingsView.enabledExperimentalPatches');
+    notifyListeners();
+  }
 
   void deleteKeystore() {
     _managerAPI.deleteKeystore();
