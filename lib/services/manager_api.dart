@@ -237,10 +237,20 @@ class ManagerAPI {
   }
 
   Future<String?> getLatestPatchesVersion() async {
-    return await _revancedAPI.getLatestReleaseVersion(
-      '.json',
-      defaultPatchesRepo,
-    );
+    try {
+      String repoName = getPatchesRepo();
+      if (repoName == defaultPatchesRepo) {
+         return await _revancedAPI.getLatestReleaseVersion(
+          '.json',
+          defaultPatchesRepo,
+        );
+      } else {
+        return await _githubAPI.getLatestReleaseVersion('.json', repoName);
+      }
+    } on Exception catch (e, s) {
+      await Sentry.captureException(e, stackTrace: s);
+      return null;
+    }
   }
 
   Future<String> getCurrentManagerVersion() async {

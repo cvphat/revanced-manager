@@ -49,7 +49,8 @@
         "loadedStatusLabel": "Loaded",
         "patchesLabel": "Patches Status: ",
         "statusLabel": "Status: ",
-        "loadButton": "Load Patch"
+        "loadButton": "Load Patch",
+        "versionLabel": "Version: "
     },
     "patcherView": {
         "widgetTitle": "Patcher",

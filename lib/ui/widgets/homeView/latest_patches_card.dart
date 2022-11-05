@@ -14,19 +14,34 @@ class LatestPatchesCard extends ViewModelWidget<HomeViewModel> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              I18nText('latestPatchesCard.statusLabel'),
-              Text(
-                viewModel.noPatchesLoaded
-                    ? FlutterI18n.translate(
-                        context,
-                        'latestPatchesCard.failedStatusLabel',
-                      )
-                    : FlutterI18n.translate(
-                        context,
-                        'latestPatchesCard.loadedStatusLabel',
-                      ),
+              Row(
+                children: [
+                  I18nText('latestPatchesCard.statusLabel'),
+                  Text(
+                    viewModel.noPatchesLoaded
+                        ? FlutterI18n.translate(
+                            context,
+                            'latestPatchesCard.failedStatusLabel',
+                          )
+                        : FlutterI18n.translate(
+                            context,
+                            'latestPatchesCard.loadedStatusLabel',
+                          ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Visibility(
+                visible: viewModel.patchesVersion != null,
+                child: Row(
+                  children: [
+                    I18nText('latestPatchesCard.versionLabel'),
+                    Text(viewModel.patchesVersion!),
+                  ],
+                ),
               ),
             ],
           ),
