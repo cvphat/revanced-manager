@@ -5,6 +5,7 @@ import 'package:revanced_manager/models/patch.dart';
 import 'package:revanced_manager/models/patched_application.dart';
 import 'package:revanced_manager/services/manager_api.dart';
 import 'package:revanced_manager/services/patcher_api.dart';
+import 'package:revanced_manager/services/toast.dart';
 import 'package:revanced_manager/ui/views/patcher/patcher_viewmodel.dart';
 import 'package:revanced_manager/ui/widgets/shared/custom_material_button.dart';
 import 'package:stacked/stacked.dart';
@@ -24,6 +25,7 @@ class PatchesSelectorViewModel extends BaseViewModel {
       locator<PatcherViewModel>().selectedApp!.originalPackageName,
     ));
     patches.sort((a, b) => a.name.compareTo(b.name));
+    selectRecommendedPatches();
     notifyListeners();
   }
 
@@ -46,7 +48,7 @@ class PatchesSelectorViewModel extends BaseViewModel {
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: I18nText('patchesSelectorView.selectAllPatchesWarningTitle'),
+        title: I18nText('warning'),
         backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
         content: I18nText('patchesSelectorView.selectAllPatchesWarningContent'),
         actions: <Widget>[
@@ -74,8 +76,30 @@ class PatchesSelectorViewModel extends BaseViewModel {
     notifyListeners();
   }
 
+  void selectRecommendedPatches() {
+    selectedPatches.clear();
+
+    if (_managerAPI.areExperimentalPatchesEnabled() == false) {
+      selectedPatches.addAll(patches.where(
+          (element) => element.excluded == false && isPatchSupported(element)));
+    }
+
+    if (_managerAPI.areExperimentalPatchesEnabled()) {
+      selectedPatches
+          .addAll(patches.where((element) => element.excluded == false));
+    }
+
+    notifyListeners();
+  }
+
+  void clearPatches() {
+    selectedPatches.clear();
+    notifyListeners();
+  }
+
   void selectPatches() {
     locator<PatcherViewModel>().selectedPatches = selectedPatches;
+    saveSelectedPatches();
     locator<PatcherViewModel>().notifyListeners();
   }
 
@@ -116,5 +140,34 @@ class PatchesSelectorViewModel extends BaseViewModel {
     return patch.compatiblePackages.any((pack) =>
         pack.name == app.packageName &&
         (pack.versions.isEmpty || pack.versions.contains(app.version)));
+  }
+
+  void onMenuSelection(value) {
+    switch (value) {
+      case 0:
+        loadSelectedPatches();
+        break;
+    }
+  }
+
+  Future<void> saveSelectedPatches() async {
+    List<String> selectedPatches =
+        this.selectedPatches.map((patch) => patch.name).toList();
+    await _managerAPI.setSelectedPatches(
+        locator<PatcherViewModel>().selectedApp!.originalPackageName,
+        selectedPatches);
+  }
+
+  Future<void> loadSelectedPatches() async {
+    List<String> selectedPatches = await _managerAPI.getSelectedPatches(
+        locator<PatcherViewModel>().selectedApp!.originalPackageName);
+    if (selectedPatches.isNotEmpty) {
+      this.selectedPatches.clear();
+      this.selectedPatches.addAll(
+          patches.where((patch) => selectedPatches.contains(patch.name)));
+    } else {
+      locator<Toast>().showBottom('patchesSelectorView.noSavedPatches');
+    }
+    notifyListeners();
   }
 }

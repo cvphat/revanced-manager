@@ -33,7 +33,7 @@ class AppSelectorViewModel extends BaseViewModel {
       icon: application.icon,
       patchDate: DateTime.now(),
     );
-    locator<PatcherViewModel>().selectedPatches.clear();
+    locator<PatcherViewModel>().loadLastSelectedPatches();
     locator<PatcherViewModel>().notifyListeners();
   }
 
@@ -45,6 +45,15 @@ class AppSelectorViewModel extends BaseViewModel {
       );
       if (result != null && result.files.single.path != null) {
         File apkFile = File(result.files.single.path!);
+        List<String> pathSplit = result.files.single.path!.split("/");
+        pathSplit.removeLast();
+        Directory filePickerCacheDir = Directory(pathSplit.join("/"));
+        Iterable<File> deletableFiles =
+            (await filePickerCacheDir.list().toList()).whereType<File>();
+        for (var file in deletableFiles) {
+          if (file.path != apkFile.path && file.path.endsWith(".apk"))
+            file.delete();
+        }
         ApplicationWithIcon? application = await DeviceApps.getAppFromStorage(
           apkFile.path,
           true,
@@ -60,13 +69,13 @@ class AppSelectorViewModel extends BaseViewModel {
             patchDate: DateTime.now(),
             isFromStorage: true,
           );
-          locator<PatcherViewModel>().selectedPatches.clear();
+          locator<PatcherViewModel>().loadLastSelectedPatches();
           locator<PatcherViewModel>().notifyListeners();
         }
       }
     } on Exception catch (e, s) {
       await Sentry.captureException(e, stackTrace: s);
-      _toast.show('appSelectorView.errorMessage');
+      _toast.showBottom('appSelectorView.errorMessage');
     }
   }
 

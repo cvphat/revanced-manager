@@ -34,7 +34,8 @@ class GithubAPI {
     try {
       _dio = Dio(BaseOptions(
         baseUrl: 'https://api.github.com',
-      ))..httpClientAdapter = NativeAdapter();
+      ))
+        ..httpClientAdapter = NativeAdapter();
 
       _dio.interceptors.add(_dioCacheManager.interceptor);
       _dio.addSentry(

@@ -39,7 +39,7 @@ class LatestPatchesCard extends ViewModelWidget<HomeViewModel> {
                 child: Row(
                   children: [
                     I18nText('latestPatchesCard.versionLabel'),
-                    Text(viewModel.patchesVersion!),
+                    Text(viewModel.patchesVersion ?? ''),
                   ],
                 ),
               ),
