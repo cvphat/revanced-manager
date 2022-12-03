@@ -24,6 +24,21 @@ class SAdvancedSection extends StatelessWidget {
         ListTile(
           contentPadding: const EdgeInsets.symmetric(horizontal: 20.0),
           title: I18nText(
+            'settingsView.importKeystoreLabel',
+            child: const Text(
+              '',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          subtitle: I18nText('settingsView.importKeystoreHint'),
+          onTap: () => _settingsViewModel.importKeystore,
+        ),
+        ListTile(
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20.0),
+          title: I18nText(
             'settingsView.deleteKeystoreLabel',
             child: const Text(
               '',
