@@ -59,10 +59,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String rawLocale = prefs.getString('language') ?? 'en_US';
-    String replaceLocale = rawLocale.replaceAll('_', '-');
-    List<String> localeList = replaceLocale.split('-');
-    Locale locale = Locale(localeList[0], localeList[1]);
+    // String rawLocale = prefs.getString('language') ?? 'en_US';
+    // String replaceLocale = rawLocale.replaceAll('_', '-');
+    // List<String> localeList = replaceLocale.split('-');
+    // Locale locale = Locale(localeList[0], localeList[1]);
+    Locale locale = const Locale('en', 'US');
 
     return DynamicThemeBuilder(
       title: 'ReVanced Manager',
@@ -70,6 +71,7 @@ class MyApp extends StatelessWidget {
       localizationsDelegates: [
         FlutterI18nDelegate(
           translationLoader: FileTranslationLoader(
+            fallbackFile: 'en_US',
             forcedLocale: locale,
             basePath: 'assets/i18n',
             useCountryCode: true,
