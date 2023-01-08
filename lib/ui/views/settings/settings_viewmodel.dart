@@ -83,6 +83,25 @@ class SettingsViewModel extends BaseViewModel {
     }
   }
 
+  void exportKeystore() async {
+    const name = 'revanced-manager.keystore';
+    final keyStore = File(
+      '/sdcard/Android/data/app.revanced.manager.flutter/files/revanced-manager.keystore',
+    );
+
+    if (keyStore.existsSync()) {
+      try {
+        final saveDialog = SaveFileDialogParams(
+          sourceFilePath: keyStore.path,
+          destinationFileName: name,
+        );
+        await CRFileSaver.saveFileWithDialog(saveDialog);
+      } on Exception catch (e, s) {
+        Sentry.captureException(e, stackTrace: s);
+      }
+    }
+  }
+
   void deleteTempDir() {
     _managerAPI.deleteTempFolder();
     _toast.showBottom('settingsView.deletedTempDir');
