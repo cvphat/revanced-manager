@@ -21,7 +21,7 @@ class PatchesSelectorViewModel extends BaseViewModel {
 
   Future<void> initialize() async {
     getPatchesVersion();
-    patches.addAll(await _patcherAPI.getFilteredPatches(
+    patches.addAll(_patcherAPI.getFilteredPatches(
       locator<PatcherViewModel>().selectedApp!.originalPackageName,
     ));
     patches.sort((a, b) => a.name.compareTo(b.name));
@@ -136,7 +136,7 @@ class PatchesSelectorViewModel extends BaseViewModel {
 
   bool isPatchSupported(Patch patch) {
     PatchedApplication app = locator<PatcherViewModel>().selectedApp!;
-    return patch.compatiblePackages.any((pack) =>
+    return patch.compatiblePackages.isEmpty || patch.compatiblePackages.any((pack) =>
         pack.name == app.packageName &&
         (pack.versions.isEmpty || pack.versions.contains(app.version)));
   }
