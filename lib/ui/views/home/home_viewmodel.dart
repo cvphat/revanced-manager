@@ -17,6 +17,7 @@ import 'package:revanced_manager/services/toast.dart';
 import 'package:revanced_manager/ui/views/navigation/navigation_viewmodel.dart';
 import 'package:revanced_manager/ui/views/patcher/patcher_viewmodel.dart';
 import 'package:revanced_manager/ui/widgets/homeView/update_confirmation_dialog.dart';
+import 'package:revanced_manager/ui/widgets/shared/custom_card.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
@@ -38,6 +39,11 @@ class HomeViewModel extends BaseViewModel {
   String? _patchesVersion;
   get noPatchesLoaded => _patcherAPI.noPatchesLoaded;
   String? get patchesVersion => _patchesVersion;
+  String _vancedMicroGButton = '';
+  String get vancedMicroGButton => _vancedMicroGButton;
+
+  bool _hasUpdateOrInstallMicroG = false;
+  bool get hasUpdateOrInstallMicroG => _hasUpdateOrInstallMicroG;
 
   Future<void> initialize(BuildContext context) async {
     await flutterLocalNotificationsPlugin.initialize(
@@ -61,6 +67,16 @@ class HomeViewModel extends BaseViewModel {
       // _toast.show();
     }
     _patchesVersion = await _managerAPI.getLatestPatchesVersion();
+
+    final isInstalled = await _managerAPI.isVancedMicroGInstalled();
+
+    if (isInstalled) {
+      _vancedMicroGButton = 'vancedMicroGCard.updateButton';
+      _hasUpdateOrInstallMicroG = await _managerAPI.hasUpdatedVancedMicroG();
+    } else {
+      _vancedMicroGButton = 'vancedMicroGCard.installButton';
+      _hasUpdateOrInstallMicroG = true;
+    }
   }
 
   void navigateToAppInfo(PatchedApplication app) {
@@ -194,5 +210,36 @@ class HomeViewModel extends BaseViewModel {
     await Future.delayed(const Duration(seconds: 2));
     await _patcherAPI.loadLocalPatches();
     notifyListeners();
+  }
+
+  void showUpdateMicroGDialog(BuildContext context) async {
+    final result = await showDialog(
+      context: context,
+      builder: (context) {
+        return FutureBuilder(
+          future: _managerAPI.installVancedMicroG(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              Navigator.pop(context, snapshot.data);
+            }
+            return AlertDialog(
+              title: I18nText('vancedMicroGCard.microGDownloading'),
+              content: const LinearProgressIndicator(),
+            );
+          },
+        );
+      },
+    );
+
+    if (result) {
+      _vancedMicroGButton = 'vancedMicroGCard.updateButton';
+      _hasUpdateOrInstallMicroG = false;
+    }
+
+    notifyListeners();
+  }
+
+  Future<String?> getLatestMicroGVersion() async {
+    return await _managerAPI.getLatestVancedMicroGVersion();
   }
 }
