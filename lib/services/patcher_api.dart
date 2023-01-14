@@ -40,7 +40,7 @@ class PatcherAPI {
     Directory appCache = await getTemporaryDirectory();
     _dataDir = await getExternalStorageDirectory() ?? appCache;
     _tmpDir = Directory('${appCache.path}/patcher');
-    _keyStoreFile = File('${_dataDir.path}/revanced-manager.keystore');
+    _keyStoreFile = await _managerAPI.getKeyStoreFile();
     cleanPatcher();
   }
 
