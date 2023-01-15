@@ -63,10 +63,12 @@ class GithubAPI {
   Future<GithubLatestRelease?> getLatestRelease(String repoName) async {
     try {
       final response = await _dio.get(
-        '/repos/$repoName/releases',
+        '/repos/$repoName/releases/latest',
         options: _cacheOptions,
       );
-      return GithubLatestRelease.fromJson(response.data);
+      return response.data != null
+          ? GithubLatestRelease.fromJson(response.data)
+          : null;
     } on Exception catch (e, s) {
       await Sentry.captureException(e, stackTrace: s);
       return null;
