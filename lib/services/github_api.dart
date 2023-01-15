@@ -6,6 +6,7 @@ import 'package:dio_http_cache_lts/dio_http_cache_lts.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:injectable/injectable.dart';
 import 'package:native_dio_client/native_dio_client.dart';
+import 'package:revanced_manager/models/github_latest_release.dart';
 import 'package:revanced_manager/models/patch.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:sentry_dio/sentry_dio.dart';
@@ -14,7 +15,11 @@ import 'package:timeago/timeago.dart';
 @lazySingleton
 class GithubAPI {
   late Dio _dio = Dio();
+  final String vancedMicroGRepo = 'TeamVanced/VancedMicroG';
   final DioCacheManager _dioCacheManager = DioCacheManager(CacheConfig());
+  GithubLatestRelease? _vancedMicroGLatestRelease;
+  GithubLatestRelease? get vancedMicroGLatestRelease =>
+      _vancedMicroGLatestRelease;
   final Options _cacheOptions = buildCacheOptions(
     const Duration(hours: 6),
     maxStale: const Duration(days: 1),
@@ -41,6 +46,7 @@ class GithubAPI {
       _dio.addSentry(
         captureFailedRequests: true,
       );
+      _vancedMicroGLatestRelease = await getLatestRelease(vancedMicroGRepo);
     } on Exception catch (e, s) {
       await Sentry.captureException(e, stackTrace: s);
     }
@@ -54,13 +60,13 @@ class GithubAPI {
     }
   }
 
-  Future<Map<String, dynamic>?> getLatestRelease(String repoName) async {
+  Future<GithubLatestRelease?> getLatestRelease(String repoName) async {
     try {
-      var response = await _dio.get(
+      final response = await _dio.get(
         '/repos/$repoName/releases',
         options: _cacheOptions,
       );
-      return response.data[0];
+      return GithubLatestRelease.fromJson(response.data);
     } on Exception catch (e, s) {
       await Sentry.captureException(e, stackTrace: s);
       return null;
@@ -100,15 +106,14 @@ class GithubAPI {
 
   Future<File?> getLatestReleaseFile(String extension, String repoName) async {
     try {
-      Map<String, dynamic>? release = await getLatestRelease(repoName);
+      GithubLatestRelease? release = await getLatestRelease(repoName);
       if (release != null) {
-        Map<String, dynamic>? asset =
-            (release['assets'] as List<dynamic>).firstWhereOrNull(
-          (asset) => (asset['name'] as String).endsWith(extension),
+        GithubReleaseAsset? asset = release.assets.firstWhereOrNull(
+          (asset) => asset.name.endsWith(extension),
         );
         if (asset != null) {
           return await DefaultCacheManager().getSingleFile(
-            asset['browser_download_url'],
+            asset.browserDownloadUrl,
           );
         }
       }
@@ -139,15 +144,16 @@ class GithubAPI {
     String repoName,
   ) async {
     try {
-      Map<String, dynamic>? release = await getLatestRelease(repoName);
+      GithubLatestRelease? release = await getLatestRelease(repoName);
       if (release != null) {
-        return release['name'];
+        return release.tagName;
+      } else {
+        return 'Unknown';
       }
     } on Exception catch (e, s) {
       await Sentry.captureException(e, stackTrace: s);
       return null;
     }
-    return null;
   }
 
   Future<String?> getLatestReleaseTime(
@@ -155,9 +161,9 @@ class GithubAPI {
     String repoName,
   ) async {
     try {
-      Map<String, dynamic>? release = await getLatestRelease(repoName);
+      GithubLatestRelease? release = await getLatestRelease(repoName);
       if (release != null) {
-        DateTime timestamp = DateTime.parse(release['published_at'] as String);
+        DateTime timestamp = release.createdAt;
         return format(timestamp, locale: 'en_short');
       }
     } on Exception catch (e, s) {

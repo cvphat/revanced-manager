@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:app_installer/app_installer.dart';
+import 'package:collection/collection.dart';
 import 'package:device_apps/device_apps.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:injectable/injectable.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
@@ -21,7 +23,6 @@ class ManagerAPI {
   final RootAPI _rootAPI = RootAPI();
   final String patcherRepo = 'revanced-patcher';
   final String cliRepo = 'revanced-cli';
-  final String vancedMicroGRepo = 'TeamVanced/VancedMicroG';
   final String vancedMicroGPackageName = 'com.mgoogle.android.gms';
   late String storedPatchesFile = '/selected-patches.json';
   late SharedPreferences _prefs;
@@ -495,8 +496,7 @@ class ManagerAPI {
 
   Future<bool> hasUpdatedVancedMicroG() async {
     final app = await DeviceApps.getApp(vancedMicroGPackageName);
-    final version =
-        await _revancedAPI.getLatestReleaseVersion('apk', vancedMicroGRepo);
+    final version = _githubAPI.vancedMicroGLatestRelease?.tagName;
     if (app != null &&
         version != null &&
         version.contains(app.versionName ?? '')) {
@@ -509,9 +509,12 @@ class ManagerAPI {
   Future<bool> installVancedMicroG() async {
     final isInstall = await isVancedMicroGInstalled();
     if (!isInstall) {
-      final vancedMicroGFile =
-          await _revancedAPI.getLatestReleaseFile('apk', vancedMicroGRepo);
-      if (vancedMicroGFile != null) {
+      final vancedMicroGAsset = _githubAPI.vancedMicroGLatestRelease?.assets
+          .firstWhereOrNull((element) => element.name.endsWith('apk'));
+      if (vancedMicroGAsset != null) {
+        final vancedMicroGFile = await DefaultCacheManager().getSingleFile(
+          vancedMicroGAsset.browserDownloadUrl,
+        );
         await AppInstaller.installApk(vancedMicroGFile.path);
         return true;
       }
@@ -520,6 +523,6 @@ class ManagerAPI {
   }
 
   Future<String?> getLatestVancedMicroGVersion() async {
-    return await _revancedAPI.getLatestReleaseVersion('apk', vancedMicroGRepo);
+    return _githubAPI.vancedMicroGLatestRelease?.tagName;
   }
 }

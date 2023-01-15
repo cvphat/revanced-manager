@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:revanced_manager/app/app.locator.dart';
+import 'package:revanced_manager/models/github_latest_release.dart';
 import 'package:revanced_manager/ui/views/home/home_viewmodel.dart';
 import 'package:revanced_manager/ui/widgets/shared/custom_material_button.dart';
 
@@ -20,7 +21,7 @@ class UpdateConfirmationDialog extends StatelessWidget {
       builder: (context, scrollController) => SingleChildScrollView(
         controller: scrollController,
         child: SafeArea(
-          child: FutureBuilder<Map<String, dynamic>?>(
+          child: FutureBuilder<GithubLatestRelease?>(
             future: model.getLatestManagerRelease(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {
@@ -63,7 +64,7 @@ class UpdateConfirmationDialog extends StatelessWidget {
                                   ),
                                   const SizedBox(width: 8.0),
                                   Text(
-                                    snapshot.data!["tag_name"] ?? "Unknown",
+                                    snapshot.data?.tagName ?? "Unknow Name",
                                     style: TextStyle(
                                       fontSize: 20,
                                       fontWeight: FontWeight.w500,
@@ -113,7 +114,7 @@ class UpdateConfirmationDialog extends StatelessWidget {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       padding: const EdgeInsets.all(20.0),
-                      data: snapshot.data!["body"] ?? "",
+                      data: snapshot.data?.body ?? "",
                     ),
                   ),
                 ],
