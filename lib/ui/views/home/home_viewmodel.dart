@@ -9,6 +9,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:injectable/injectable.dart';
 import 'package:revanced_manager/app/app.locator.dart';
 import 'package:revanced_manager/app/app.router.dart';
+import 'package:revanced_manager/models/github_latest_release.dart';
 import 'package:revanced_manager/models/patched_application.dart';
 import 'package:revanced_manager/services/manager_api.dart';
 import 'package:revanced_manager/services/patcher_api.dart';
@@ -17,7 +18,6 @@ import 'package:revanced_manager/services/toast.dart';
 import 'package:revanced_manager/ui/views/navigation/navigation_viewmodel.dart';
 import 'package:revanced_manager/ui/views/patcher/patcher_viewmodel.dart';
 import 'package:revanced_manager/ui/widgets/homeView/update_confirmation_dialog.dart';
-import 'package:revanced_manager/ui/widgets/shared/custom_card.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
@@ -177,7 +177,7 @@ class HomeViewModel extends BaseViewModel {
     );
   }
 
-  Future<Map<String, dynamic>?> getLatestManagerRelease() {
+  Future<GithubLatestRelease?> getLatestManagerRelease() {
     return _githubAPI.getLatestRelease(_managerAPI.defaultManagerRepo);
   }
 
