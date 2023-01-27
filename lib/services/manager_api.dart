@@ -8,6 +8,7 @@ import 'package:injectable/injectable.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:revanced_manager/app/app.locator.dart';
+import 'package:revanced_manager/models/github_latest_release.dart';
 import 'package:revanced_manager/models/patch.dart';
 import 'package:revanced_manager/models/patched_application.dart';
 import 'package:revanced_manager/services/github_api.dart';
@@ -33,9 +34,13 @@ class ManagerAPI {
   String defaultIntegrationsRepo = 'revanced/revanced-integrations';
   String defaultCliRepo = 'revanced/revanced-cli';
   String defaultManagerRepo = 'cvphat/revanced-manager';
+  String defaultMicroGRepo = 'TeamVanced/VancedMicroG';
+
+  GithubLatestRelease? _vancedMicroGLatestRelease;
 
   Future<void> initialize() async {
     _prefs = await SharedPreferences.getInstance();
+
     storedPatchesFile =
         (await getApplicationDocumentsDirectory()).path + storedPatchesFile;
   }
@@ -92,6 +97,17 @@ class ManagerAPI {
       value = defaultIntegrationsRepo;
     }
     await _prefs.setString('integrationsRepo', value);
+  }
+
+  String getMicroGRepo() {
+    return _prefs.getString('microGRepo') ?? defaultMicroGRepo;
+  }
+
+  Future<void> setMicroGRepo(String value) async {
+    if (value.isEmpty || value.startsWith('/') || value.endsWith('/')) {
+      value = defaultMicroGRepo;
+    }
+    await _prefs.setString('microGRepo', value);
   }
 
   bool getUseDynamicTheme() {
@@ -273,7 +289,7 @@ class ManagerAPI {
     try {
       String repoName = getPatchesRepo();
       if (repoName == defaultPatchesRepo) {
-         return await _revancedAPI.getLatestReleaseVersion(
+        return await _revancedAPI.getLatestReleaseVersion(
           '.json',
           defaultPatchesRepo,
         );
@@ -494,14 +510,27 @@ class ManagerAPI {
     return await DeviceApps.isAppInstalled(vancedMicroGPackageName);
   }
 
+  Future<GithubLatestRelease?> getVancedMicroGLatestRelease() async {
+    if (_vancedMicroGLatestRelease == null) {
+      final vancedMicroGRepo = getMicroGRepo();
+      _vancedMicroGLatestRelease =
+          await _githubAPI.getLatestRelease(vancedMicroGRepo);
+    }
+
+    return _vancedMicroGLatestRelease;
+  }
+
   Future<bool> hasUpdatedVancedMicroG() async {
     final app = await DeviceApps.getApp(vancedMicroGPackageName);
-    final version = _githubAPI.vancedMicroGLatestRelease?.tagName;
+    final vancedMicroGLatestRelease = await getVancedMicroGLatestRelease();
+    final version = vancedMicroGLatestRelease?.tagName;
     if (app != null &&
         version != null &&
         version.contains(app.versionName ?? '')) {
       return false;
     }
+
+    if (version == null) return false;
 
     return true;
   }
@@ -509,7 +538,8 @@ class ManagerAPI {
   Future<bool> installVancedMicroG() async {
     final isInstall = await isVancedMicroGInstalled();
     if (!isInstall) {
-      final vancedMicroGAsset = _githubAPI.vancedMicroGLatestRelease?.assets
+      final vancedMicroGLatestRelease = await getVancedMicroGLatestRelease();
+      final vancedMicroGAsset = vancedMicroGLatestRelease?.assets
           .firstWhereOrNull((element) => element.name.endsWith('apk'));
       if (vancedMicroGAsset != null) {
         final vancedMicroGFile = await DefaultCacheManager().getSingleFile(
@@ -523,6 +553,7 @@ class ManagerAPI {
   }
 
   Future<String?> getLatestVancedMicroGVersion() async {
-    return _githubAPI.vancedMicroGLatestRelease?.tagName;
+    final vancedMicroGLatestRelease = await getVancedMicroGLatestRelease();
+    return vancedMicroGLatestRelease?.tagName;
   }
 }

@@ -196,7 +196,9 @@
         "jsonSelectorErrorMessage": "Unable to use selected JSON file",
         "deleteLogsLabel": "Delete logs",
         "deleteLogsHint": "Delete collected manager logs",
-        "deletedLogs": "Logs deleted"
+        "deletedLogs": "Logs deleted",
+        "orgMicroGLabel": "MicroG Organization",
+        "sourcesMicroGLabel": "MicroG Source"
     },
     "appInfoView": {
         "widgetTitle": "App info",

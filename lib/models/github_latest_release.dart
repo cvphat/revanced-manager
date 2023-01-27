@@ -4,12 +4,13 @@ part 'github_latest_release.g.dart';
 
 @JsonSerializable()
 class GithubLatestRelease {
-  final String id;
+  final int id;
   final String name;
   final String body;
   @JsonKey(name: 'tag_name')
   final String tagName;
-  final DateTime createdAt;
+  @JsonKey(name: 'published_at')
+  final DateTime publishedAt;
   final List<GithubReleaseAsset> assets;
 
   const GithubLatestRelease({
@@ -17,7 +18,7 @@ class GithubLatestRelease {
     required this.name,
     required this.body,
     required this.tagName,
-    required this.createdAt,
+    required this.publishedAt,
     this.assets = const [],
   });
 
@@ -29,9 +30,9 @@ class GithubLatestRelease {
 
 @JsonSerializable()
 class GithubReleaseAsset {
-  final String id;
+  final int id;
   final String name;
-  final String size;
+  final int size;
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
   @JsonKey(name: 'browser_download_url')

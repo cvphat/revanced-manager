@@ -15,11 +15,8 @@ import 'package:timeago/timeago.dart';
 @lazySingleton
 class GithubAPI {
   late Dio _dio = Dio();
-  final String vancedMicroGRepo = 'TeamVanced/VancedMicroG';
   final DioCacheManager _dioCacheManager = DioCacheManager(CacheConfig());
-  GithubLatestRelease? _vancedMicroGLatestRelease;
-  GithubLatestRelease? get vancedMicroGLatestRelease =>
-      _vancedMicroGLatestRelease;
+
   final Options _cacheOptions = buildCacheOptions(
     const Duration(hours: 6),
     maxStale: const Duration(days: 1),
@@ -46,7 +43,6 @@ class GithubAPI {
       _dio.addSentry(
         captureFailedRequests: true,
       );
-      _vancedMicroGLatestRelease = await getLatestRelease(vancedMicroGRepo);
     } on Exception catch (e, s) {
       await Sentry.captureException(e, stackTrace: s);
     }
@@ -165,7 +161,7 @@ class GithubAPI {
     try {
       GithubLatestRelease? release = await getLatestRelease(repoName);
       if (release != null) {
-        DateTime timestamp = release.createdAt;
+        DateTime timestamp = release.publishedAt;
         return format(timestamp, locale: 'en_short');
       }
     } on Exception catch (e, s) {

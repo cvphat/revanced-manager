@@ -17,16 +17,22 @@ class SManageSources extends BaseViewModel {
   final TextEditingController _patSourceController = TextEditingController();
   final TextEditingController _orgIntSourceController = TextEditingController();
   final TextEditingController _intSourceController = TextEditingController();
+  final TextEditingController _orgMicroGSourceController =
+      TextEditingController();
+  final TextEditingController _microGSourceController = TextEditingController();
 
   Future<void> showSourcesDialog(BuildContext context) async {
     String hostRepository = _managerAPI.getRepoUrl();
     String patchesRepo = _managerAPI.getPatchesRepo();
     String integrationsRepo = _managerAPI.getIntegrationsRepo();
+    String microGRepo = _managerAPI.getMicroGRepo();
     _hostSourceController.text = hostRepository;
     _orgPatSourceController.text = patchesRepo.split('/')[0];
     _patSourceController.text = patchesRepo.split('/')[1];
     _orgIntSourceController.text = integrationsRepo.split('/')[0];
     _intSourceController.text = integrationsRepo.split('/')[1];
+    _orgMicroGSourceController.text = microGRepo.split('/')[0];
+    _microGSourceController.text = microGRepo.split('/')[1];
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -99,6 +105,28 @@ class SManageSources extends BaseViewModel {
                 hint: integrationsRepo.split('/')[1],
                 onChanged: (value) => notifyListeners(),
               ),
+              const SizedBox(height: 20),
+              CustomTextField(
+                leadingIcon: Icon(
+                  Icons.extension_outlined,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+                inputController: _orgMicroGSourceController,
+                label: I18nText('settingsView.orgMicroGLabel'),
+                hint: microGRepo.split('/')[0],
+                onChanged: (value) => notifyListeners(),
+              ),
+              const SizedBox(height: 8),
+              CustomTextField(
+                leadingIcon: const Icon(
+                  Icons.merge_outlined,
+                  color: Colors.transparent,
+                ),
+                inputController: _microGSourceController,
+                label: I18nText('settingsView.sourcesMicroGLabel'),
+                hint: microGRepo.split('/')[1],
+                onChanged: (value) => notifyListeners(),
+              ),
             ],
           ),
         ),
@@ -111,6 +139,8 @@ class SManageSources extends BaseViewModel {
               _patSourceController.clear();
               _orgIntSourceController.clear();
               _intSourceController.clear();
+              _orgMicroGSourceController.clear();
+              _microGSourceController.clear();
               Navigator.of(context).pop();
             },
           ),
@@ -123,6 +153,9 @@ class SManageSources extends BaseViewModel {
               );
               _managerAPI.setIntegrationsRepo(
                 '${_orgIntSourceController.text}/${_intSourceController.text}',
+              );
+              _managerAPI.setMicroGRepo(
+                '${_orgMicroGSourceController.text}/${_microGSourceController.text}',
               );
               Navigator.of(context).pop();
             },
