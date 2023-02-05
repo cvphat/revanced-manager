@@ -15,7 +15,6 @@ class UpdateConfirmationDialog extends StatelessWidget {
 
     return DraggableScrollableSheet(
       expand: false,
-      initialChildSize: 0.5,
       snap: true,
       snapSizes: const [0.5],
       builder: (context, scrollController) => SingleChildScrollView(
@@ -38,7 +37,11 @@ class UpdateConfirmationDialog extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(
-                        top: 40.0, left: 24.0, right: 24.0, bottom: 32.0),
+                      top: 40.0,
+                      left: 24.0,
+                      right: 24.0,
+                      bottom: 32.0,
+                    ),
                     child: Row(
                       children: [
                         Expanded(
@@ -48,10 +51,11 @@ class UpdateConfirmationDialog extends StatelessWidget {
                               I18nText(
                                 'homeView.updateDialogTitle',
                                 child: const Text(
-                                  "",
+                                  '',
                                   style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold),
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                               const SizedBox(height: 4.0),
@@ -94,13 +98,14 @@ class UpdateConfirmationDialog extends StatelessWidget {
                     child: I18nText(
                       'homeView.updateChangelogTitle',
                       child: Text(
-                        "",
+                        '',
                         style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w500,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSecondaryContainer),
+                          fontSize: 20,
+                          fontWeight: FontWeight.w500,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSecondaryContainer,
+                        ),
                       ),
                     ),
                   ),
@@ -114,7 +119,7 @@ class UpdateConfirmationDialog extends StatelessWidget {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       padding: const EdgeInsets.all(20.0),
-                      data: snapshot.data?.body ?? "",
+                      data: snapshot.data?.body ?? '',
                     ),
                   ),
                 ],

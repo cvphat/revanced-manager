@@ -22,10 +22,10 @@ class SManageSources extends BaseViewModel {
   final TextEditingController _microGSourceController = TextEditingController();
 
   Future<void> showSourcesDialog(BuildContext context) async {
-    String hostRepository = _managerAPI.getRepoUrl();
-    String patchesRepo = _managerAPI.getPatchesRepo();
-    String integrationsRepo = _managerAPI.getIntegrationsRepo();
-    String microGRepo = _managerAPI.getMicroGRepo();
+    final hostRepository = _managerAPI.getRepoUrl();
+    final patchesRepo = _managerAPI.getPatchesRepo();
+    final integrationsRepo = _managerAPI.getIntegrationsRepo();
+    final microGRepo = _managerAPI.getMicroGRepo();
     _hostSourceController.text = hostRepository;
     _orgPatSourceController.text = patchesRepo.split('/')[0];
     _patSourceController.text = patchesRepo.split('/')[1];

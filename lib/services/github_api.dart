@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_http_cache_lts/dio_http_cache_lts.dart';
@@ -8,8 +9,8 @@ import 'package:injectable/injectable.dart';
 import 'package:native_dio_client/native_dio_client.dart';
 import 'package:revanced_manager/models/github_latest_release.dart';
 import 'package:revanced_manager/models/patch.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:sentry_dio/sentry_dio.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:timeago/timeago.dart';
 
 @lazySingleton
@@ -32,12 +33,13 @@ class GithubAPI {
     'com.spotify.music': 'spotify',
   };
 
-  void initialize(String repoUrl) async {
+  Future<void> initialize(String repoUrl) async {
     try {
-      _dio = Dio(BaseOptions(
-        baseUrl: repoUrl,
-      ))
-        ..httpClientAdapter = NativeAdapter();
+      _dio = Dio(
+        BaseOptions(
+          baseUrl: repoUrl,
+        ),
+      )..httpClientAdapter = NativeAdapter();
 
       _dio.interceptors.add(_dioCacheManager.interceptor);
       _dio.addSentry(
@@ -76,10 +78,10 @@ class GithubAPI {
     String repoName,
     DateTime since,
   ) async {
-    String path =
+    final String path =
         'src/main/kotlin/app/revanced/patches/${repoAppPath[packageName]}';
     try {
-      var response = await _dio.get(
+      final response = await _dio.get(
         '/repos/$repoName/commits',
         queryParameters: {
           'path': path,
@@ -87,7 +89,7 @@ class GithubAPI {
         },
         options: _cacheOptions,
       );
-      List<dynamic> commits = response.data;
+      final List<dynamic> commits = response.data;
       return commits
           .map(
             (commit) => (commit['commit']['message']).split('\n')[0] +
@@ -104,9 +106,9 @@ class GithubAPI {
 
   Future<File?> getLatestReleaseFile(String extension, String repoName) async {
     try {
-      GithubLatestRelease? release = await getLatestRelease(repoName);
+      final release = await getLatestRelease(repoName);
       if (release != null) {
-        GithubReleaseAsset? asset = release.assets.firstWhereOrNull(
+        final asset = release.assets.firstWhereOrNull(
           (asset) => asset.name.endsWith(extension),
         );
         if (asset != null) {
@@ -125,9 +127,9 @@ class GithubAPI {
   Future<List<Patch>> getPatches(String repoName) async {
     List<Patch> patches = [];
     try {
-      File? f = await getLatestReleaseFile('.json', repoName);
+      final File? f = await getLatestReleaseFile('.json', repoName);
       if (f != null) {
-        List<dynamic> list = jsonDecode(f.readAsStringSync());
+        final List<dynamic> list = jsonDecode(f.readAsStringSync());
         patches = list.map((patch) => Patch.fromJson(patch)).toList();
       }
     } on Exception catch (e, s) {
@@ -142,7 +144,7 @@ class GithubAPI {
     String repoName,
   ) async {
     try {
-      GithubLatestRelease? release = await getLatestRelease(repoName);
+      final release = await getLatestRelease(repoName);
       if (release != null) {
         return release.tagName;
       } else {
@@ -159,9 +161,9 @@ class GithubAPI {
     String repoName,
   ) async {
     try {
-      GithubLatestRelease? release = await getLatestRelease(repoName);
+      final release = await getLatestRelease(repoName);
       if (release != null) {
-        DateTime timestamp = release.publishedAt;
+        final timestamp = release.publishedAt;
         return format(timestamp, locale: 'en_short');
       }
     } on Exception catch (e, s) {
